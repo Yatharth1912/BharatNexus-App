@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Merchant Dashboard — Bharat Nexus</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+/* ═══════════ IMAGE UPLOAD STYLES ═══════════ */
+#img-preview-box {
+  transition: border-color 0.3s, background 0.3s;
+}
+#img-preview-box:hover {
+  border-color: rgba(245,166,35,0.4) !important;
+  background: rgba(255,255,255,0.05) !important;
+}
+#img-remove-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.upload-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.8);
+  transition: all 0.2s;
+}
+.upload-label:hover {
+  transform: translateY(-1px);
+}
+.upload-label-gallery {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.15);
+}
+.upload-label-gallery:hover {
+  background: rgba(255,255,255,0.12);
+}
+.upload-label-camera {
+  background: rgba(245,166,35,0.08);
+  border: 1px solid rgba(245,166,35,0.25);
+}
+.upload-label-camera:hover {
+  background: rgba(245,166,35,0.18);
+}
+.product-img-box {
+  width: 100%;
+  height: 140px;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.04);
+  margin-bottom: 0.8rem;
+}
+.product-img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.product-img-box .product-emoji {
+  font-size: 3rem;
+}
+</style>
+</head>
+<body>
+
+<button class="mobile-menu-btn" onclick="toggleSidebar()" style="display:none;">☰</button>
+
+<div class="app-shell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">⚡ BHARAT NEXUS</div>
+    <div class="sidebar-user">
+      <div class="sidebar-user-avatar" id="user-avatar">S</div>
+      <div class="sidebar-user-name" id="user-name">Loading...</div>
+      <div class="sidebar-user-role">Shop Owner</div>
+      <div id="verify-badge" class="sidebar-verified unverified">⚠ Not Verified</div>
+    </div>
+    <div class="nav-item active" data-page="dashboard" onclick="switchPage('dashboard')">
+      <span class="nav-icon">📊</span> Dashboard
+    </div>
+    <div class="nav-item" data-page="products" onclick="switchPage('products')">
+      <span class="nav-icon">📦</span> My Products
+    </div>
+    <div class="nav-item" data-page="orders" onclick="switchPage('orders')">
+      <span class="nav-icon">🛒</span> Orders
+    </div>
+    <div class="nav-item" data-page="shop" onclick="switchPage('shop')">
+      <span class="nav-icon">🏪</span> Shop Profile
+    </div>
+    <div class="nav-spacer"></div>
+    <div class="nav-item logout-btn" onclick="logout()">
+      <span class="nav-icon">🚪</span> Logout
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+    <!-- DASHBOARD -->
+    <div class="tab-content active" id="page-dashboard">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title" id="greeting">Welcome back! 🙏</h1>
+          <p class="page-subtitle" id="shop-subtitle">Loading your shop...</p>
+        </div>
+        <button class="btn-primary" style="width:auto; padding:10px 24px;"
+          onclick="switchPage('products'); openAddProduct();">
+          + Add Product
+        </button>
+      </div>
+
+      <div id="verify-banner"></div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">💰</div>
+          <div class="stat-value" id="stat-revenue">₹0</div>
+          <div class="stat-label">Total Revenue</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📦</div>
+          <div class="stat-value" id="stat-orders">0</div>
+          <div class="stat-label">Orders Received</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🛒</div>
+          <div class="stat-value" id="stat-products">0</div>
+          <div class="stat-label">Products Listed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⭐</div>
+          <div class="stat-value" id="stat-rating">0</div>
+          <div class="stat-label">Shop Rating</div>
+        </div>
+      </div>
+
+      <h3 style="margin-bottom:1rem;">Recent Orders</h3>
+      <div id="recent-orders"></div>
+    </div>
+
+    <!-- PRODUCTS -->
+    <div class="tab-content" id="page-products">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">📦 My Products</h1>
+          <p class="page-subtitle">Add, edit, remove — apne products manage karein</p>
+        </div>
+        <button class="btn-primary" style="width:auto; padding:10px 24px;"
+          onclick="openAddProduct()">+ Add New Product</button>
+      </div>
+
+      <div class="search-bar">
+        <input type="text" class="search-input" id="prod-search"
+          placeholder="🔍 Search products..." oninput="renderProducts()">
+      </div>
+
+      <div id="products-list"></div>
+    </div>
+
+    <!-- ORDERS -->
+    <div class="tab-content" id="page-orders">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">🛒 Incoming Orders</h1>
+          <p class="page-subtitle">Customer orders — accept, complete karo aur kamai badhao!</p>
+        </div>
+      </div>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="filterOrders(this,'all')">All</button>
+        <button class="tab-btn" onclick="filterOrders(this,'pending')">Pending</button>
+        <button class="tab-btn" onclick="filterOrders(this,'completed')">Completed</button>
+      </div>
+      <div id="merchant-orders"></div>
+    </div>
+
+    <!-- SHOP PROFILE -->
+    <div class="tab-content" id="page-shop">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">🏪 Shop Profile</h1>
+          <p class="page-subtitle">Apni dukaan ki details edit karein</p>
+        </div>
+      </div>
+      <div class="card" style="max-width:600px;">
+        <div style="text-align:center; margin-bottom:2rem;">
+          <div style="font-size:4rem; margin-bottom:0.5rem;">🏪</div>
+          <h2 style="font-size:1.4rem; font-weight:700;" id="sp-shop-name">-</h2>
+          <p style="color:rgba(255,255,255,0.5); font-size:0.9rem;" id="sp-category">-</p>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+          <div>
+            <label class="form-label">Owner Name</label>
+            <div style="padding:10px 14px; background:rgba(255,255,255,0.04);
+              border-radius:10px; font-size:0.9rem;" id="sp-owner">-</div>
+          </div>
+          <div>
+            <label class="form-label">Phone</label>
+            <div style="padding:10px 14px; background:rgba(255,255,255,0.04);
+              border-radius:10px; font-size:0.9rem;" id="sp-phone">-</div>
+          </div>
+          <div>
+            <label class="form-label">Village / Town</label>
+            <div style="padding:10px 14px; background:rgba(255,255,255,0.04);
+              border-radius:10px; font-size:0.9rem;" id="sp-village">-</div>
+          </div>
+          <div>
+            <label class="form-label">Rating</label>
+            <div style="padding:10px 14px; background:rgba(255,255,255,0.04);
+              border-radius:10px; font-size:0.9rem; color:#F5A623;" id="sp-rating">-</div>
+          </div>
+        </div>
+        <div style="margin-top:1.5rem; padding:1rem; border-radius:12px;
+          text-align:center; font-size:0.9rem;" id="verification-status"></div>
+        <div id="verify-action" style="margin-top:1rem;"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ═══════════ ADD/EDIT PRODUCT MODAL ═══════════ -->
+<div class="modal-overlay" id="product-modal">
+  <div class="modal">
+    <h2 class="modal-title" id="modal-title">Add New Product</h2>
+    <p class="modal-sub" id="modal-sub">List a new product on your shop</p>
+
+    <!-- Emoji -->
+    <div class="form-group">
+      <label class="form-label">Product Emoji (visual icon)</label>
+      <input type="text" id="p-emoji" class="form-input"
+        placeholder="🌾 🥛 💊 etc." maxlength="2"
+        style="font-size:1.5rem; text-align:center;">
+    </div>
+
+    <!-- ✅ IMAGE UPLOAD SECTION -->
+    <div class="form-group">
+      <label class="form-label">Product Image (Optional)</label>
+
+      <!-- Preview Box -->
+      <div id="img-preview-box"
+        style="
+          width:100%;
+          height:180px;
+          border:2px dashed rgba(255,255,255,0.2);
+          border-radius:16px;
+          display:flex;
+          flex-direction:column;
+          align-items:center;
+          justify-content:center;
+          margin-bottom:0.8rem;
+          overflow:hidden;
+          background:rgba(255,255,255,0.03);
+          cursor:pointer;
+          position:relative;
+        "
+        onclick="document.getElementById('img-gallery').click()">
+
+        <!-- Preview Image -->
+        <img id="img-preview" src="" alt="preview"
+          style="display:none; width:100%; height:100%; object-fit:cover; border-radius:14px;">
+
+        <!-- Placeholder -->
+        <div id="img-placeholder"
+          style="text-align:center; color:rgba(255,255,255,0.4); pointer-events:none;">
+          <div style="font-size:2.5rem; margin-bottom:0.5rem;">🖼️</div>
+          <div style="font-size:0.85rem;">Click to select image</div>
+          <div style="font-size:0.75rem; margin-top:0.3rem; opacity:0.6;">
+            JPG, PNG, WEBP • Max 5MB
+          </div>
+        </div>
+
+        <!-- Remove Button -->
+        <button id="img-remove-btn"
+          onclick="removeImage(event)"
+          style="
+            position:absolute;
+            top:8px;
+            right:8px;
+            background:rgba(192,57,43,0.9);
+            border:none;
+            border-radius:50%;
+            width:30px;
+            height:30px;
+            cursor:pointer;
+            font-size:0.85rem;
+            color:white;
+            z-index:10;
+            font-weight:700;
+          ">✕</button>
+
+      </div>
+
+      <!-- Upload Buttons Row -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.8rem;">
+
+        <!-- Gallery -->
+        <label class="upload-label upload-label-gallery">
+          <span style="font-size:1.2rem;">🖼️</span>
+          <span>Gallery</span>
+          <input type="file" id="img-gallery" accept="image/*"
+            style="display:none;" onchange="handleImageSelect(this)">
+        </label>
+
+        <!-- Camera -->
+        <label class="upload-label upload-label-camera">
+          <span style="font-size:1.2rem;">📷</span>
+          <span>Camera</span>
+          <input type="file" id="img-camera" accept="image/*"
+            capture="environment" style="display:none;"
+            onchange="handleImageSelect(this)">
+        </label>
+
+      </div>
+
+      <!-- Size Warning -->
+      <div id="img-size-warning"
+        style="
+          display:none;
+          margin-top:0.6rem;
+          padding:8px 12px;
+          background:rgba(192,57,43,0.15);
+          border:1px solid rgba(192,57,43,0.3);
+          border-radius:8px;
+          font-size:0.78rem;
+          color:#E8541A;
+        ">
+        ⚠ Image too large! Max 5MB allowed. Please choose a smaller image.
+      </div>
+
+      <!-- Selected File Name -->
+      <div id="img-file-name"
+        style="
+          display:none;
+          margin-top:0.5rem;
+          font-size:0.78rem;
+          color:rgba(255,255,255,0.4);
+          text-align:center;
+        ">
+      </div>
+
+    </div>
+    <!-- ✅ IMAGE SECTION END -->
+
+    <!-- Product Name -->
+    <div class="form-group">
+      <label class="form-label">Product Name</label>
+      <input type="text" id="p-name" class="form-input" placeholder="e.g. Aata 5kg">
+    </div>
+
+    <!-- Price & Stock -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+      <div class="form-group">
+        <label class="form-label">Price (₹)</label>
+        <input type="number" id="p-price" class="form-input" placeholder="0" min="1">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Stock</label>
+        <input type="number" id="p-stock" class="form-input" placeholder="0" min="0">
+      </div>
+    </div>
+
+    <!-- Category -->
+    <div class="form-group">
+      <label class="form-label">Category</label>
+      <select id="p-category" class="form-input">
+        <option>Grocery</option>
+        <option>Dairy</option>
+        <option>Medicine</option>
+        <option>Personal Care</option>
+        <option>Snacks</option>
+        <option>Stationery</option>
+        <option>Household</option>
+        <option>Fruits & Vegetables</option>
+        <option>Clothing</option>
+        <option>Other</option>
+      </select>
+    </div>
+
+    <!-- Modal Actions -->
+    <div class="modal-actions">
+      <button class="btn-outline" style="flex:1;" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" style="flex:2;" onclick="saveProduct()">Save Product</button>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+
+<script src="../js/data.js"></script>
+<script>
+const session = requireAuth('merchant');
+if (!session) throw new Error('no auth');
+
+let editingId = null;
+let orderFilter = 'all';
+let merchant = getUserById(session.id, 'merchant');
+
+// ═══════════ IMAGE VARIABLES ═══════════
+let currentImageBase64 = null;
+
+// ═══════════ INIT UI ═══════════
+document.getElementById('user-name').textContent = session.name;
+document.getElementById('user-avatar').textContent = session.name.charAt(0).toUpperCase();
+document.getElementById('greeting').textContent = `Namaste, ${session.name}! 🙏`;
+document.getElementById('shop-subtitle').textContent = merchant.shopName + ' • ' + merchant.village;
+
+// Verification badge
+const verified = merchant.gstVerified && merchant.faceVerified;
+const badge = document.getElementById('verify-badge');
+if (verified) {
+  badge.className = 'sidebar-verified';
+  badge.textContent = '✓ Verified Shop';
+} else {
+  badge.className = 'sidebar-verified unverified';
+  badge.innerHTML = '⚠ <a href="security.html" style="color:#E8541A;">Verify Now</a>';
+}
+
+// Verify banner on dashboard
+const banner = document.getElementById('verify-banner');
+if (!verified) {
+  banner.innerHTML = `
+    <div style="
+      background:linear-gradient(135deg,rgba(192,57,43,0.15),rgba(232,84,26,0.1));
+      border:1px solid rgba(232,84,26,0.3);
+      border-radius:16px;
+      padding:1.2rem 1.5rem;
+      margin-bottom:2rem;
+      display:flex;
+      gap:1rem;
+      align-items:center;
+      flex-wrap:wrap;
+    ">
+      <div style="font-size:2rem;">🔐</div>
+      <div style="flex:1; min-width:250px;">
+        <strong style="color:#E8541A;">Verify your shop to start selling!</strong>
+        <p style="color:rgba(255,255,255,0.6); font-size:0.85rem; margin-top:0.2rem;">
+          GST aur Face scan verification complete karo taaki customers trust karein.
+        </p>
+      </div>
+      <a href="security.html" class="btn-primary"
+        style="width:auto; padding:10px 20px; font-size:0.9rem;">
+        Verify Now 🔒
+      </a>
+    </div>
+  `;
+}
+
+// ═══════════ PAGE SWITCHING ═══════════
+function switchPage(p) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + p).classList.add('active');
+  document.querySelectorAll('.nav-item[data-page]').forEach(n => n.classList.remove('active'));
+  document.querySelector(`.nav-item[data-page="${p}"]`).classList.add('active');
+  document.getElementById('sidebar').classList.remove('open');
+
+  if (p === 'dashboard') loadDashboard();
+  if (p === 'products') renderProducts();
+  if (p === 'orders') renderOrders();
+  if (p === 'shop') renderShopProfile();
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+// ═══════════ DASHBOARD ═══════════
+function loadDashboard() {
+  merchant = getUserById(session.id, 'merchant');
+  const orders = getOrdersForMerchant(session.id);
+  const completed = orders.filter(o => o.status === 'completed');
+  const revenue = completed.reduce((s, o) => {
+    const myTotal = o.items
+      .filter(i => i.merchantId === session.id)
+      .reduce((a, i) => a + i.price * i.qty, 0);
+    return s + myTotal;
+  }, 0);
+
+  document.getElementById('stat-revenue').textContent = fmtPrice(revenue);
+  document.getElementById('stat-orders').textContent = orders.length;
+  document.getElementById('stat-products').textContent = merchant.products.length;
+  document.getElementById('stat-rating').textContent = '⭐ ' + merchant.rating.toFixed(1);
+
+  const recentEl = document.getElementById('recent-orders');
+  const recent = orders.slice(0, 3);
+  if (recent.length === 0) {
+    recentEl.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">📭</div>
+        <div class="empty-state-title">No orders yet</div>
+        <div class="empty-state-text">Jaise hi customers order karenge, yahan dikhenge.</div>
+      </div>`;
+  } else {
+    recentEl.innerHTML = recent.map(o => renderOrderCard(o)).join('');
+  }
+}
+loadDashboard();
+
+// ═══════════ IMAGE UPLOAD FUNCTIONS ═══════════
+
+// Image select handler (gallery + camera dono ke liye)
+function handleImageSelect(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  // File type check
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+  if (!allowedTypes.includes(file.type)) {
+    toast('❌ Only JPG, PNG, WEBP images allowed!', 'error');
+    input.value = '';
+    return;
+  }
+
+  // File size check — max 5MB
+  const maxSize = 5 * 1024 * 1024;
+  const warning = document.getElementById('img-size-warning');
+  if (file.size > maxSize) {
+    warning.style.display = 'block';
+    input.value = '';
+    return;
+  }
+  warning.style.display = 'none';
+
+  // FileReader se Base64 mein convert karo
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    currentImageBase64 = e.target.result;
+    showImagePreview(currentImageBase64, file.name);
+    toast('✅ Image selected!', 'success');
+  };
+  reader.onerror = function() {
+    toast('❌ Error reading image. Try again!', 'error');
+  };
+  reader.readAsDataURL(file);
+}
+
+// Preview dikhao
+function showImagePreview(src, fileName) {
+  const previewImg    = document.getElementById('img-preview');
+  const placeholder   = document.getElementById('img-placeholder');
+  const removeBtn     = document.getElementById('img-remove-btn');
+  const previewBox    = document.getElementById('img-preview-box');
+  const fileNameEl    = document.getElementById('img-file-name');
+
+  previewImg.src = src;
+  previewImg.style.display = 'block';
+  placeholder.style.display = 'none';
+  removeBtn.style.display = 'flex';
+  previewBox.style.borderColor = 'rgba(245,166,35,0.6)';
+  previewBox.style.borderStyle = 'solid';
+  previewBox.style.background = 'rgba(0,0,0,0.2)';
+  previewBox.onclick = null; // Click disable (remove btn ke liye)
+
+  if (fileName) {
+    fileNameEl.style.display = 'block';
+    fileNameEl.textContent = '📎 ' + fileName;
+  }
+}
+
+// Image remove karo
+function removeImage(event) {
+  event.stopPropagation();
+  currentImageBase64 = null;
+
+  const previewImg  = document.getElementById('img-preview');
+  const placeholder = document.getElementById('img-placeholder');
+  const removeBtn   = document.getElementById('img-remove-btn');
+  const previewBox  = document.getElementById('img-preview-box');
+  const fileNameEl  = document.getElementById('img-file-name');
+
+  previewImg.src = '';
+  previewImg.style.display = 'none';
+  placeholder.style.display = 'flex';
+  removeBtn.style.display = 'none';
+  previewBox.style.borderColor = 'rgba(255,255,255,0.2)';
+  previewBox.style.borderStyle = 'dashed';
+  previewBox.style.background = 'rgba(255,255,255,0.03)';
+  previewBox.onclick = () => document.getElementById('img-gallery').click();
+
+  fileNameEl.style.display = 'none';
+  fileNameEl.textContent = '';
+
+  document.getElementById('img-gallery').value = '';
+  document.getElementById('img-camera').value = '';
+  document.getElementById('img-size-warning').style.display = 'none';
+
+  toast('🗑️ Image removed', 'info');
+}
+
+// Reset image upload (modal open/close par)
+function resetImageUpload() {
+  currentImageBase64 = null;
+
+  const previewImg  = document.getElementById('img-preview');
+  const placeholder = document.getElementById('img-placeholder');
+  const removeBtn   = document.getElementById('img-remove-btn');
+  const previewBox  = document.getElementById('img-preview-box');
+  const fileNameEl  = document.getElementById('img-file-name');
+
+  previewImg.src = '';
+  previewImg.style.display = 'none';
+  placeholder.style.display = 'flex';
+  removeBtn.style.display = 'none';
+  previewBox.style.borderColor = 'rgba(255,255,255,0.2)';
+  previewBox.style.borderStyle = 'dashed';
+  previewBox.style.background = 'rgba(255,255,255,0.03)';
+  previewBox.onclick = () => document.getElementById('img-gallery').click();
+
+  fileNameEl.style.display = 'none';
+  fileNameEl.textContent = '';
+
+  document.getElementById('img-gallery').value = '';
+  document.getElementById('img-camera').value = '';
+  document.getElementById('img-size-warning').style.display = 'none';
+}
+
+// ═══════════ PRODUCTS ═══════════
+function renderProducts() {
+  merchant = getUserById(session.id, 'merchant');
+  const search = document.getElementById('prod-search').value.toLowerCase();
+  const wrap = document.getElementById('products-list');
+  let prods = merchant.products;
+  if (search) prods = prods.filter(p =>
+    p.name.toLowerCase().includes(search) ||
+    p.category.toLowerCase().includes(search)
+  );
+
+  if (prods.length === 0) {
+    wrap.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">📦</div>
+        <div class="empty-state-title">${search ? 'No products match' : 'No products yet'}</div>
+        <div class="empty-state-text">
+          ${search ? 'Try a different search' : 'Add your first product to start selling!'}
+        </div>
+        ${!search ? `<button class="btn-primary" style="width:auto; padding:10px 24px;"
+          onclick="openAddProduct()">+ Add Product</button>` : ''}
+      </div>`;
+    return;
+  }
+
+  wrap.innerHTML = `<div class="grid-cards">` + prods.map(p => `
+    <div class="product-card">
+
+      <!-- Product Image or Emoji -->
+      <div class="product-img-box">
+        ${p.image
+          ? `<img src="${p.image}" alt="${p.name}"
+               style="width:100%; height:100%; object-fit:cover;">`
+          : `<span class="product-emoji">${p.emoji || '📦'}</span>`
+        }
+      </div>
+
+      <div class="product-name">${p.name}</div>
+      <div class="product-shop">${p.category}</div>
+
+      <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
+        <span style="font-size:0.7rem; color:rgba(255,255,255,0.4);">Price:</span>
+        <input type="number" class="price-input-small" value="${p.price}"
+          onchange="quickUpdate('${p.id}','price',this.value)">
+      </div>
+
+      <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.8rem;">
+        <span style="font-size:0.7rem; color:rgba(255,255,255,0.4);">Stock:</span>
+        <input type="number" class="price-input-small" value="${p.stock}"
+          onchange="quickUpdate('${p.id}','stock',this.value)"
+          style="color:${p.stock < 10 ? '#E74C3C' : '#4CAF50'};">
+      </div>
+
+      <div class="product-stock ${p.stock === 0 ? 'out' : p.stock < 10 ? 'low' : ''}">
+        ${p.stock === 0
+          ? '⚠ Out of Stock'
+          : p.stock < 10
+            ? '⚠ Low Stock: ' + p.stock + ' left'
+            : '✓ In Stock'}
+      </div>
+
+      <div class="product-actions" style="margin-top:0.5rem;">
+        <button class="btn-icon" onclick="editProduct('${p.id}')" title="Edit">✏️</button>
+        <button class="btn-icon danger" onclick="deleteProduct('${p.id}')" title="Delete">🗑️</button>
+      </div>
+
+    </div>
+  `).join('') + `</div>`;
+}
+
+function quickUpdate(pid, field, val) {
+  const v = parseInt(val);
+  if (isNaN(v) || v < 0) {
+    toast('Invalid value', 'error');
+    renderProducts();
+    return;
+  }
+  updateProduct(session.id, pid, { [field]: v });
+  toast(field === 'price' ? 'Price updated 💰' : 'Stock updated 📦', 'success');
+  if (field === 'stock') renderProducts();
+  loadDashboard();
+}
+
+function openAddProduct() {
+  editingId = null;
+  document.getElementById('modal-title').textContent = 'Add New Product';
+  document.getElementById('modal-sub').textContent = 'List a new product on your shop';
+  document.getElementById('p-emoji').value = '';
+  document.getElementById('p-name').value = '';
+  document.getElementById('p-price').value = '';
+  document.getElementById('p-stock').value = '';
+  document.getElementById('p-category').value = 'Grocery';
+  resetImageUpload(); // ✅ Image reset
+  document.getElementById('product-modal').classList.add('open');
+}
+
+function editProduct(pid) {
+  const p = merchant.products.find(x => x.id === pid);
+  if (!p) return;
+  editingId = pid;
+  document.getElementById('modal-title').textContent = 'Edit Product';
+  document.getElementById('modal-sub').textContent = 'Update product details';
+  document.getElementById('p-emoji').value = p.emoji || '';
+  document.getElementById('p-name').value = p.name;
+  document.getElementById('p-price').value = p.price;
+  document.getElementById('p-stock').value = p.stock;
+  document.getElementById('p-category').value = p.category;
+
+  // ✅ Existing image load karo
+  resetImageUpload();
+  if (p.image) {
+    currentImageBase64 = p.image;
+    showImagePreview(p.image, 'Current Image');
+  }
+
+  document.getElementById('product-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('product-modal').classList.remove('open');
+  resetImageUpload(); // ✅ Reset on close
+}
+
+function saveProduct() {
+  const emoji    = document.getElementById('p-emoji').value.trim() || '📦';
+  const name     = document.getElementById('p-name').value.trim();
+  const price    = parseInt(document.getElementById('p-price').value);
+  const stock    = parseInt(document.getElementById('p-stock').value);
+  const category = document.getElementById('p-category').value;
+
+  if (!name)                    return toast('Please enter product name', 'error');
+  if (!price || price < 1)      return toast('Please enter valid price', 'error');
+  if (isNaN(stock) || stock < 0) return toast('Please enter valid stock', 'error');
+
+  // ✅ Image bhi save hogi
+  const productData = {
+    emoji,
+    name,
+    price,
+    stock,
+    category,
+    image: currentImageBase64 || null
+  };
+
+  if (editingId) {
+    updateProduct(session.id, editingId, productData);
+    toast('Product updated! ✓', 'success');
+  } else {
+    addProduct(session.id, productData);
+    toast('Product added! 🎉', 'success');
+  }
+
+  closeModal();
+  renderProducts();
+  loadDashboard();
+}
+
+function deleteProduct(pid) {
+  if (!confirm('Are you sure you want to delete this product?')) return;
+  removeProduct(session.id, pid);
+  toast('Product removed', 'info');
+  renderProducts();
+  loadDashboard();
+}
+
+// ═══════════ ORDERS ═══════════
+function renderOrders() {
+  merchant = getUserById(session.id, 'merchant');
+  let orders = getOrdersForMerchant(session.id);
+  if (orderFilter !== 'all') orders = orders.filter(o => o.status === orderFilter);
+  const wrap = document.getElementById('merchant-orders');
+
+  if (orders.length === 0) {
+    wrap.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">📭</div>
+        <div class="empty-state-title">No ${orderFilter !== 'all' ? orderFilter : ''} orders</div>
+        <div class="empty-state-text">Orders will appear here as customers place them.</div>
+      </div>`;
+    return;
+  }
+
+  wrap.innerHTML = orders.map(o => renderOrderCard(o, true)).join('');
+}
+
+function renderOrderCard(o, showActions = false) {
+  const myItems = o.items.filter(i => i.merchantId === session.id);
+  const myTotal = myItems.reduce((s, i) => s + i.price * i.qty, 0);
+  return `
+    <div class="order-card ${o.status}">
+      <div class="order-header">
+        <div class="order-id">${o.id}</div>
+        <span class="order-status status-${o.status}">${o.status}</span>
+      </div>
+      <div class="order-meta">🗓️ ${fmtDate(o.createdAt)}</div>
+      <div class="order-items">
+        ${myItems.map(i =>
+          `<div>• ${i.name} × ${i.qty} — ${fmtPrice(i.price * i.qty)}</div>`
+        ).join('')}
+      </div>
+      <div class="order-footer">
+        <div style="color:rgba(255,255,255,0.5); font-size:0.8rem;">Your earnings from this order</div>
+        <div class="order-total">${fmtPrice(myTotal)}</div>
+      </div>
+      ${showActions && o.status === 'pending' ? `
+        <div style="margin-top:1rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+          <button class="btn-primary btn-green"
+            style="width:auto; padding:8px 16px; font-size:0.85rem;"
+            onclick="updateOrder('${o.id}','completed')">✓ Mark Complete</button>
+          <button class="btn-outline"
+            style="padding:8px 16px; font-size:0.85rem;"
+            onclick="updateOrder('${o.id}','cancelled')">✕ Cancel</button>
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+function updateOrder(oid, status) {
+  updateOrderStatus(oid, status);
+  toast(`Order ${status}!`, status === 'completed' ? 'success' : 'info');
+  renderOrders();
+  loadDashboard();
+}
+
+function filterOrders(el, f) {
+  orderFilter = f;
+  document.querySelectorAll('#page-orders .tab-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderOrders();
+}
+
+// ═══════════ SHOP PROFILE ═══════════
+function renderShopProfile() {
+  merchant = getUserById(session.id, 'merchant');
+  document.getElementById('sp-shop-name').textContent = merchant.shopName;
+  document.getElementById('sp-category').textContent = merchant.category + ' • ' + merchant.village;
+  document.getElementById('sp-owner').textContent = merchant.name;
+  document.getElementById('sp-phone').textContent = '+91 ' + merchant.phone;
+  document.getElementById('sp-village').textContent = merchant.village;
+  document.getElementById('sp-rating').textContent = '⭐ ' + merchant.rating.toFixed(1);
+
+  const vStatus = document.getElementById('verification-status');
+  if (merchant.gstVerified && merchant.faceVerified) {
+    vStatus.style.background = 'rgba(26,122,74,0.1)';
+    vStatus.style.border = '1px solid rgba(26,122,74,0.4)';
+    vStatus.style.color = '#4CAF50';
+    vStatus.innerHTML = '✅ <strong>Verified Shop</strong> — GST & Face Scan complete. Customers trust you!';
+    document.getElementById('verify-action').innerHTML = '';
+  } else {
+    vStatus.style.background = 'rgba(192,57,43,0.1)';
+    vStatus.style.border = '1px solid rgba(192,57,43,0.4)';
+    vStatus.style.color = '#E8541A';
+    vStatus.innerHTML = '⚠ <strong>Verification Pending</strong> — Complete GST + Face Scan to unlock all features.';
+    document.getElementById('verify-action').innerHTML = `
+      <a href="security.html" class="btn-primary"
+        style="display:block; text-align:center; padding:12px;">
+        🔐 Complete Verification
+      </a>`;
+  }
+}
+</script>
+</body>
+</html>

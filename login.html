@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — Bharat Nexus</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="auth-wrapper">
+  <a href="index.html" class="back-home">← Home</a>
+
+  <div class="auth-card">
+    <div class="auth-logo">⚡ BHARAT NEXUS</div>
+    <p class="auth-sub" id="form-title">Sign in to your account</p>
+
+    <!-- ROLE TOGGLE -->
+    <div class="role-toggle">
+      <button class="role-btn active" data-role="customer" onclick="switchRole('customer')">🛒 Customer</button>
+      <button class="role-btn" data-role="merchant" onclick="switchRole('merchant')">🏪 Shop Owner</button>
+    </div>
+
+    <div id="auth-form">
+      <div class="form-group">
+        <label class="form-label">Phone Number</label>
+        <input type="tel" id="phone" class="form-input" placeholder="10-digit mobile number" maxlength="10">
+      </div>
+
+      <div id="name-field" class="form-group" style="display:none;">
+        <label class="form-label">Full Name</label>
+        <input type="text" id="name" class="form-input" placeholder="Aapka poora naam">
+      </div>
+
+      <div id="shop-field" style="display:none;">
+        <div class="form-group">
+          <label class="form-label">Shop Name</label>
+          <input type="text" id="shopName" class="form-input" placeholder="e.g. Ramu Kirana Store">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select id="category" class="form-input">
+            <option value="">-- Select --</option>
+            <option>Grocery / Kiryana</option>
+            <option>General Store</option>
+            <option>Medical / Pharmacy</option>
+            <option>Dairy</option>
+            <option>Vegetables & Fruits</option>
+            <option>Clothing</option>
+            <option>Electronics</option>
+            <option>Stationery</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Village / Town</label>
+          <input type="text" id="village" class="form-input" placeholder="Aapke gaanv ka naam">
+        </div>
+      </div>
+
+      <div id="village-field-customer" class="form-group" style="display:none;">
+        <label class="form-label">Village / Town</label>
+        <input type="text" id="custVillage" class="form-input" placeholder="Aapke gaanv ka naam">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" id="password" class="form-input" placeholder="Use '1234' for demo">
+      </div>
+
+      <button class="btn-primary" id="submit-btn" onclick="handleAuth()">Sign In</button>
+
+      <div id="switch-mode" class="auth-footer">
+        New here? <a href="#" onclick="toggleMode(event)">Create an account</a>
+      </div>
+
+      <div style="margin-top:1rem; padding:0.8rem; background:rgba(245,166,35,0.08); border:1px dashed rgba(245,166,35,0.3); border-radius:10px; font-size:0.78rem; color:rgba(255,255,255,0.6); text-align:center;">
+        💡 <strong style="color:#F5A623">Demo Tip:</strong> Phone <strong style="color:#fff">9876543210</strong> / Password <strong style="color:#fff">1234</strong> for sample shop. Customer: <strong style="color:#fff">1111111111</strong> / <strong style="color:#fff">1234</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/data.js"></script>
+<script>
+let currentRole = 'customer';
+let isSignup = false;
+
+// Get role from URL
+const urlRole = new URLSearchParams(location.search).get('role');
+if (urlRole) switchRole(urlRole);
+
+function switchRole(role) {
+  currentRole = role;
+  document.querySelectorAll('.role-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.role === role);
+  });
+  updateFormUI();
+}
+
+function toggleMode(e) {
+  e.preventDefault();
+  isSignup = !isSignup;
+  updateFormUI();
+}
+
+function updateFormUI() {
+  document.getElementById('form-title').textContent = isSignup
+    ? (currentRole === 'merchant' ? 'Register your dukaan' : 'Create customer account')
+    : 'Sign in to your account';
+  document.getElementById('submit-btn').textContent = isSignup ? '🚀 Create Account' : 'Sign In';
+  document.getElementById('switch-mode').innerHTML = isSignup
+    ? 'Already have an account? <a href="#" onclick="toggleMode(event)">Sign in</a>'
+    : 'New here? <a href="#" onclick="toggleMode(event)">Create an account</a>';
+
+  document.getElementById('name-field').style.display = isSignup ? 'block' : 'none';
+  document.getElementById('shop-field').style.display = (isSignup && currentRole === 'merchant') ? 'block' : 'none';
+  document.getElementById('village-field-customer').style.display = (isSignup && currentRole === 'customer') ? 'block' : 'none';
+}
+
+function handleAuth() {
+  const phone = document.getElementById('phone').value.trim();
+  const password = document.getElementById('password').value;
+
+  if (!/^\d{10}$/.test(phone)) return toast('Please enter a valid 10-digit phone number', 'error');
+  if (!password) return toast('Please enter password', 'error');
+
+  if (isSignup) {
+    const name = document.getElementById('name').value.trim();
+    if (!name) return toast('Please enter your name', 'error');
+
+    // Check existing
+    if (findUserByPhone(phone, currentRole)) return toast('Account already exists! Try signing in.', 'error');
+
+    let extra = {};
+    if (currentRole === 'merchant') {
+      const shopName = document.getElementById('shopName').value.trim();
+      const category = document.getElementById('category').value;
+      const village = document.getElementById('village').value.trim();
+      if (!shopName || !category || !village) return toast('Please fill all shop details', 'error');
+      extra = { shopName, category, village };
+    } else {
+      const village = document.getElementById('custVillage').value.trim();
+      if (!village) return toast('Please enter your village', 'error');
+      extra = { village };
+    }
+
+    const newUser = createUser({
+      phone, password, name, role: currentRole, ...extra
+    });
+
+    toast('Account created! 🎉', 'success');
+    setSession(newUser);
+
+    // For merchants, redirect to security verification
+    setTimeout(() => {
+      if (currentRole === 'merchant') {
+        window.location.href = 'pages/security.html';
+      } else {
+        window.location.href = 'pages/customer.html';
+      }
+    }, 800);
+  } else {
+    const user = findUserByPhone(phone, currentRole);
+    if (!user) return toast('No account found. Please sign up first.', 'error');
+    if (user.password !== password) return toast('Wrong password! (hint: use 1234)', 'error');
+
+    setSession(user);
+    toast('Welcome back, ' + user.name + '! 🙏', 'success');
+    setTimeout(() => {
+      if (currentRole === 'merchant') {
+        window.location.href = 'pages/merchant.html';
+      } else {
+        window.location.href = 'pages/customer.html';
+      }
+    }, 600);
+  }
+}
+</script>
+</body>
+</html>

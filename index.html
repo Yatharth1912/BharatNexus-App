@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bharat Nexus — Disrupting Rural Logistics</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  body { background: #0D1B2A; color: #fff; overflow-x: hidden; }
+
+  #particle-canvas { position: fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; }
+
+  .hero {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    padding: 6rem 2rem 4rem;
+    background: radial-gradient(ellipse at 70% 50%, rgba(232,84,26,0.15), transparent 60%),
+                radial-gradient(ellipse at 20% 80%, rgba(26,122,74,0.1), transparent 50%), #0D1B2A;
+  }
+  .hero-circle {
+    position: absolute;
+    border-radius: 50%;
+    animation: pulse 4s ease-in-out infinite;
+  }
+  .hero-circle.c1 {
+    width: 600px; height: 600px;
+    right: -100px; top: -100px;
+    background: radial-gradient(circle, rgba(232,84,26,0.2), transparent 70%);
+  }
+  .hero-circle.c2 {
+    width: 400px; height: 400px;
+    left: -50px; bottom: 0;
+    background: radial-gradient(circle, rgba(26,122,74,0.15), transparent 70%);
+    animation-delay: 2s;
+  }
+  @keyframes pulse { 0%,100%{transform:scale(1);opacity:0.7} 50%{transform:scale(1.1);opacity:1} }
+
+  .hero-content { position: relative; z-index: 2; text-align: center; max-width: 900px; }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(232,84,26,0.15);
+    border: 1px solid rgba(232,84,26,0.4);
+    color: #F5A623;
+    padding: 6px 20px;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+  }
+  .hero-title {
+    font-size: clamp(3rem, 9vw, 7rem);
+    font-weight: 900;
+    line-height: 1;
+    background: linear-gradient(135deg, #fff 30%, #E8541A 70%, #F5A623 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -2px;
+  }
+  .hero-sub {
+    font-size: clamp(1rem, 2.5vw, 1.4rem);
+    color: rgba(255,255,255,0.75);
+    margin: 1.2rem 0;
+  }
+  .hero-quote {
+    font-style: italic;
+    color: #F5A623;
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    margin: 1.5rem auto;
+    max-width: 650px;
+    padding: 1rem 2rem;
+    border-left: 3px solid #E8541A;
+    text-align: left;
+    background: rgba(232,84,26,0.05);
+    border-radius: 0 8px 8px 0;
+  }
+  .hero-cta {
+    display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+    margin-top: 2rem;
+  }
+  .btn-hero {
+    background: linear-gradient(135deg, #E8541A, #F5A623);
+    color: #fff;
+    padding: 16px 38px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    box-shadow: 0 8px 32px rgba(232,84,26,0.4);
+    transition: all 0.3s;
+    display: inline-block;
+  }
+  .btn-hero:hover { transform: translateY(-3px); box-shadow: 0 16px 48px rgba(232,84,26,0.6); }
+  .btn-hero.secondary {
+    background: transparent;
+    border: 2px solid rgba(255,255,255,0.3);
+    box-shadow: none;
+  }
+  .btn-hero.secondary:hover { border-color: #E8541A; color: #E8541A; }
+
+  /* ROLE CARDS */
+  .role-section {
+    padding: 5rem 2rem;
+    position: relative;
+    z-index: 2;
+  }
+  .role-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  .role-card {
+    background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(232,84,26,0.05));
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 24px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+  }
+  .role-card:hover {
+    transform: translateY(-10px);
+    border-color: rgba(232,84,26,0.5);
+    box-shadow: 0 24px 60px rgba(232,84,26,0.2);
+  }
+  .role-card.merchant:hover { border-color: rgba(26,122,74,0.5); box-shadow: 0 24px 60px rgba(26,122,74,0.2); }
+  .role-card.driver:hover { border-color: rgba(100,149,237,0.5); box-shadow: 0 24px 60px rgba(100,149,237,0.2); }
+  .role-icon { font-size: 4rem; margin-bottom: 1rem; display: block; }
+  .role-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.5rem; }
+  .role-desc { color: rgba(255,255,255,0.6); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.5rem; }
+  .role-btn {
+    display: inline-block;
+    padding: 10px 28px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    background: linear-gradient(135deg, #E8541A, #F5A623);
+  }
+  .role-card.merchant .role-btn { background: linear-gradient(135deg, #1A7A4A, #4CAF50); }
+  .role-card.driver .role-btn { background: linear-gradient(135deg, #6495ED, #9B59B6); }
+
+  .section-head { text-align: center; margin-bottom: 3rem; }
+  .section-head h2 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 900;
+    background: linear-gradient(135deg, #fff, #F5A623);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .section-head p { color: rgba(255,255,255,0.55); margin-top: 0.5rem; }
+
+  .mini-stats {
+    display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap; margin-top: 3rem;
+  }
+  .mini-stat { text-align: center; }
+  .mini-stat b {
+    font-size: 2.2rem; font-weight: 900;
+    background: linear-gradient(135deg, #E8541A, #F5A623);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: block;
+  }
+  .mini-stat span { font-size: 0.75rem; color: rgba(255,255,255,0.4); letter-spacing:1px; text-transform:uppercase; }
+
+  footer {
+    text-align: center;
+    padding: 3rem 2rem;
+    border-top: 1px solid rgba(232,84,26,0.2);
+    color: rgba(255,255,255,0.4);
+    font-size: 0.85rem;
+    position: relative; z-index: 2;
+  }
+  footer strong { color: #E8541A; }
+
+  @media (max-width: 600px) {
+    .mini-stats { gap: 1.5rem; }
+    .mini-stat b { font-size: 1.6rem; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="particle-canvas"></canvas>
+
+<nav class="landing-nav">
+  <div class="landing-logo">⚡ BHARAT NEXUS</div>
+  <div class="landing-nav-actions">
+    <button class="btn-outline" onclick="window.location.href='login.html'">Login</button>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-circle c1"></div>
+  <div class="hero-circle c2"></div>
+  <div class="hero-content">
+    <div class="hero-badge">🇮🇳 A Deep-Rooted Social Enterprise</div>
+    <h1 class="hero-title">BHARAT<br>NEXUS</h1>
+    <p class="hero-sub">Disrupting Rural Logistics & Hyperlocal Delivery</p>
+    <div class="hero-quote">
+      "Gaanv ke log bhi deserve karte hain — fast, fair aur affordable delivery."
+    </div>
+    <div class="hero-cta">
+      <a href="#roles" class="btn-hero">🚀 Get Started</a>
+      <a href="login.html" class="btn-hero secondary">👤 Login / Signup</a>
+    </div>
+    <div class="mini-stats">
+      <div class="mini-stat"><b>₹20-40</b><span>Fair Delivery</span></div>
+      <div class="mini-stat"><b>6L+</b><span>Villages</span></div>
+      <div class="mini-stat"><b>4+</b><span>Languages</span></div>
+      <div class="mini-stat"><b>🔒</b><span>GST + Face Verified</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="role-section" id="roles">
+  <div class="section-head">
+    <h2>Choose Your Role</h2>
+    <p>Pick how you want to use Bharat Nexus</p>
+  </div>
+
+  <div class="role-grid">
+    <div class="role-card" onclick="goLogin('customer')">
+      <div class="role-icon">🛒</div>
+      <h3 class="role-title">Customer</h3>
+      <p class="role-desc">Apne local dukaan se saaman order karo — kiryana, medical, kapde, sab kuch ghar pe.</p>
+      <div class="role-btn">Order Now →</div>
+    </div>
+    <div class="role-card merchant" onclick="goLogin('merchant')">
+      <div class="role-icon">🏪</div>
+      <h3 class="role-title">Shop Owner</h3>
+      <p class="role-desc">Apni dukaan ko online le jao. Products add karo, orders manage karo, badhiya kamai karo.</p>
+      <div class="role-btn">Register Shop →</div>
+    </div>
+    <div class="role-card driver" onclick="goLogin('driver')">
+      <div class="role-icon">🛺</div>
+      <h3 class="role-title">Driver / Partner</h3>
+      <p class="role-desc" style="color:#6495ED;">Trip register karo, gaanv jaate waqt extra delivery pick karo, bina extra fuel ke kamai karo.</p>
+      <div class="role-btn" style="background:linear-gradient(135deg,#6495ED,#9B59B6)">Coming Soon 🔜</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div style="font-size:2rem; margin-bottom:1rem;">⚡</div>
+  <div style="font-size:1.2rem; font-weight:900; color:#fff; letter-spacing:2px; margin-bottom:0.5rem;">BHARAT NEXUS</div>
+  <p>Created with ❤️ by <strong>Yatharth Mangal</strong> • A Deep-Rooted Social Enterprise</p>
+  <p style="margin-top:0.5rem; font-size:0.75rem; opacity:0.6;">"Bharat ka Har Gaanv, Har Dukaan, Ek App."</p>
+</footer>
+
+<script src="js/data.js"></script>
+<script>
+function goLogin(role) {
+  if (role === 'driver') return;
+  window.location.href = 'login.html?role=' + role;
+}
+
+// PARTICLES
+const canvas = document.getElementById('particle-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [];
+function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
+resize(); addEventListener('resize', resize);
+class P {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random()*W; this.y = Math.random()*H;
+    this.vx = (Math.random()-0.5)*0.4; this.vy = (Math.random()-0.5)*0.4;
+    this.s = Math.random()*2+0.5; this.o = Math.random()*0.4+0.1;
+    this.c = ['#E8541A','#F5A623','#1A7A4A','#6495ED','#9B59B6'][Math.floor(Math.random()*5)];
+  }
+  update() {
+    this.x += this.vx; this.y += this.vy;
+    if (this.x<0||this.x>W||this.y<0||this.y>H) this.reset();
+  }
+  draw() {
+    ctx.save(); ctx.globalAlpha=this.o; ctx.fillStyle=this.c;
+    ctx.beginPath(); ctx.arc(this.x,this.y,this.s,0,Math.PI*2); ctx.fill(); ctx.restore();
+  }
+}
+for (let i=0;i<80;i++) particles.push(new P());
+function animate() {
+  ctx.clearRect(0,0,W,H);
+  particles.forEach(p=>{p.update();p.draw()});
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
+</body>
+</html>

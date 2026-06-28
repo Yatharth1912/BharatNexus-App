@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customer Dashboard — Bharat Nexus</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  .village-hero {
+    background: linear-gradient(135deg, rgba(232,84,26,0.12), rgba(26,122,74,0.08));
+    border: 1px solid rgba(232,84,26,0.25);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+    position: relative;
+    overflow: hidden;
+  }
+  .village-hero::before {
+    content: '';
+    position: absolute;
+    right: -40px; top: -40px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(232,84,26,0.15), transparent 70%);
+    border-radius: 50%;
+  }
+  .village-icon { font-size: 3.5rem; }
+  .village-details h2 { font-size: 1.4rem; font-weight: 800; }
+  .village-details p { color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-top: 4px; }
+  .village-tag {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 4px 12px;
+    background: linear-gradient(135deg, var(--green), var(--green-light));
+    border-radius: 100px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #fff;
+  }
+  .btn-change-village {
+    margin-left: auto;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-change-village:hover { border-color: var(--orange); color: var(--orange); }
+
+  .connection-flow {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 1rem;
+    align-items: center;
+    background: rgba(255,255,255,0.02);
+    border: 1px dashed var(--border);
+    border-radius: 16px;
+    padding: 1.2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+  .conn-node {
+    padding: 1rem;
+    border-radius: 12px;
+  }
+  .conn-node.village {
+    background: rgba(26,122,74,0.08);
+    border: 1px solid rgba(26,122,74,0.3);
+  }
+  .conn-node.town {
+    background: rgba(232,84,26,0.08);
+    border: 1px solid rgba(232,84,26,0.3);
+  }
+  .conn-icon { font-size: 2rem; margin-bottom: 4px; }
+  .conn-label { font-weight: 700; font-size: 0.95rem; }
+  .conn-sub { font-size: 0.75rem; color: rgba(255,255,255,0.5); }
+  .conn-arrow {
+    font-size: 2rem;
+    color: var(--gold);
+    animation: arrow-pulse 2s ease-in-out infinite;
+  }
+  @keyframes arrow-pulse {
+    0%,100% { opacity: 0.4; transform: translateX(0); }
+    50% { opacity: 1; transform: translateX(4px); }
+  }
+
+  .section-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+  }
+  .section-title-row h3 { font-size: 1.2rem; font-weight: 700; }
+  .section-title-row small { color: rgba(255,255,255,0.45); font-size: 0.8rem; }
+
+  /* Shop browsing */
+  .shop-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .shop-browse-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+  }
+  .shop-browse-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--green);
+    box-shadow: 0 12px 32px rgba(26,122,74,0.2);
+  }
+  .shop-browse-card.selected {
+    border-color: var(--orange);
+    background: linear-gradient(135deg, rgba(232,84,26,0.08), rgba(245,166,35,0.04));
+  }
+  .shop-browse-card.unverified {
+    opacity: 0.6;
+  }
+  .shop-browse-top {
+    display: flex;
+    gap: 0.8rem;
+    align-items: center;
+    margin-bottom: 0.7rem;
+  }
+  .shop-browse-avatar {
+    width: 52px; height: 52px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    flex-shrink: 0;
+  }
+  .shop-browse-name { font-weight: 700; font-size: 0.95rem; }
+  .shop-browse-owner { font-size: 0.72rem; color: rgba(255,255,255,0.45); margin-top: 2px; }
+  .shop-browse-cat {
+    display: inline-block;
+    font-size: 0.68rem;
+    padding: 2px 8px;
+    border-radius: 100px;
+    margin-top: 3px;
+    font-weight: 600;
+  }
+  .cat-Grocery { background: rgba(26,122,74,0.15); color: var(--green-light); }
+  .cat-Dairy { background: rgba(100,149,237,0.15); color: var(--blue); }
+  .cat-Medicine, .cat-Medical { background: rgba(192,57,43,0.15); color: #E74C3C; }
+  .cat-General { background: rgba(245,166,35,0.15); color: var(--gold); }
+  .cat-Stationery { background: rgba(155,89,182,0.15); color: var(--purple); }
+
+  .shop-browse-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.5);
+    margin-top: 0.7rem;
+    padding-top: 0.7rem;
+    border-top: 1px solid var(--border);
+  }
+  .shop-browse-meta b { color: var(--gold); font-weight: 700; }
+
+  /* Single shop products view */
+  .shop-view-header {
+    background: linear-gradient(135deg, rgba(26,122,74,0.12), rgba(232,84,26,0.08));
+    border: 1px solid rgba(26,122,74,0.3);
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    gap: 1.2rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .back-to-shops {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .back-to-shops:hover { border-color: var(--orange); color: var(--orange); }
+
+  /* Village selection modal */
+  .village-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+    margin: 1rem 0;
+  }
+  .village-option {
+    padding: 1rem;
+    background: rgba(255,255,255,0.03);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+  }
+  .village-option:hover { border-color: var(--orange); background: rgba(232,84,26,0.05); }
+  .village-option.selected { border-color: var(--orange); background: rgba(232,84,26,0.1); }
+  .village-option strong { display: block; font-size: 1rem; margin-bottom: 2px; }
+  .village-option span { font-size: 0.75rem; color: rgba(255,255,255,0.5); }
+
+  .multi-shop-banner {
+    background: linear-gradient(135deg, rgba(245,166,35,0.1), rgba(232,84,26,0.05));
+    border: 1px dashed rgba(245,166,35,0.4);
+    border-radius: 12px;
+    padding: 0.8rem 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.85rem;
+    color: var(--gold);
+    text-align: center;
+  }
+  .multi-shop-banner strong { font-size: 1rem; }
+</style>
+</head>
+<body>
+
+<button class="mobile-menu-btn" onclick="toggleSidebar()" style="display:none;">☰</button>
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">⚡ BHARAT NEXUS</div>
+    <div class="sidebar-user">
+      <div class="sidebar-user-avatar" id="user-avatar">G</div>
+      <div class="sidebar-user-name" id="user-name">Loading...</div>
+      <div class="sidebar-user-role">Customer</div>
+      <div style="margin-top:6px; font-size:0.7rem; color:rgba(255,255,255,0.4);" id="user-village">📍 Gaanv: -</div>
+    </div>
+    <div class="nav-item active" data-page="browse" onclick="switchPage('browse')">
+      <span class="nav-icon">🏪</span> Nearby Shops
+    </div>
+    <div class="nav-item" data-page="orders" onclick="switchPage('orders')">
+      <span class="nav-icon">📦</span> My Orders
+    </div>
+    <div class="nav-item" data-page="profile" onclick="switchPage('profile')">
+      <span class="nav-icon">👤</span> Profile
+    </div>
+    <div class="nav-spacer"></div>
+    <div class="nav-item logout-btn" onclick="logout()">
+      <span class="nav-icon">🚪</span> Logout
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+    <!-- BROWSE / SHOPS -->
+    <div class="tab-content active" id="page-browse">
+
+      <!-- VILLAGE HERO -->
+      <div class="village-hero" id="village-hero">
+        <div class="village-icon">🏡</div>
+        <div class="village-details">
+          <h2 id="hero-village-name">Aapka Gaanv</h2>
+          <p id="hero-connected-town">Connected town loading...</p>
+          <div class="village-tag">🇮🇳 Rural India • Hyperlocal</div>
+        </div>
+        <button class="btn-change-village" onclick="openVillageModal()">🔄 Change Gaanv</button>
+      </div>
+
+      <!-- Connection diagram -->
+      <div class="connection-flow">
+        <div class="conn-node village">
+          <div class="conn-icon">🏡</div>
+          <div class="conn-label" id="flow-village">Your Village</div>
+          <div class="conn-sub" id="flow-village-sub">Select gaanv</div>
+        </div>
+        <div class="conn-arrow">→</div>
+        <div class="conn-node town">
+          <div class="conn-icon">🏙️</div>
+          <div class="conn-label" id="flow-town">Nearby Town</div>
+          <div class="conn-sub" id="flow-town-sub">Connected shops</div>
+        </div>
+      </div>
+
+      <!-- CART button top -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
+        <h3 style="font-size:1.3rem; font-weight:800;">🏪 Shops in your connected town</h3>
+        <button class="btn-primary" style="width:auto; padding:10px 20px; font-size:0.9rem;" onclick="toggleCart()">
+          🛒 Cart (<span id="cart-count-mini">0</span>)
+        </button>
+      </div>
+
+      <div class="multi-shop-banner">
+        💡 <strong>Multi-Shop Basket:</strong> Ek order mein multiple dukaanon se saaman add karo — ek hi delivery mein sab ghar pe!
+      </div>
+
+      <div id="shop-view-container">
+        <!-- Shop list OR shop detail -->
+      </div>
+
+    </div>
+
+    <!-- ORDERS -->
+    <div class="tab-content" id="page-orders">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">📦 My Orders</h1>
+          <p class="page-subtitle">Aapke sabhi orders yahan hain</p>
+        </div>
+      </div>
+      <div id="orders-list"></div>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="tab-content" id="page-profile">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">👤 My Profile</h1>
+          <p class="page-subtitle">Account details</p>
+        </div>
+      </div>
+      <div class="card" style="max-width:500px;">
+        <div style="text-align:center; margin-bottom:2rem;">
+          <div class="sidebar-user-avatar" style="width:80px; height:80px; font-size:2rem; margin:0 auto 0.8rem;" id="profile-avatar">G</div>
+          <h2 style="font-size:1.4rem; font-weight:700;" id="profile-name">-</h2>
+          <p style="color:rgba(255,255,255,0.5); font-size:0.9rem;" id="profile-phone">-</p>
+        </div>
+        <div style="margin-bottom:1rem;">
+          <label class="form-label">Village / Gaanv</label>
+          <div style="padding:10px 14px; background:rgba(255,255,255,0.04); border-radius:10px; font-size:0.9rem;" id="profile-village">-</div>
+        </div>
+        <div style="margin-bottom:1rem;">
+          <label class="form-label">Connected Town</label>
+          <div style="padding:10px 14px; background:rgba(255,255,255,0.04); border-radius:10px; font-size:0.9rem; color:var(--gold);" id="profile-town">-</div>
+        </div>
+        <div style="margin-bottom:1rem;">
+          <label class="form-label">Saved Address</label>
+          <div style="padding:10px 14px; background:rgba(255,255,255,0.04); border-radius:10px; font-size:0.9rem; color:rgba(255,255,255,0.7);" id="profile-address">No address saved yet</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- CART FAB -->
+<button class="cart-fab" onclick="toggleCart()">
+  🛒
+  <span class="cart-badge" id="cart-badge">0</span>
+</button>
+
+<!-- CART PANEL -->
+<div class="cart-panel" id="cart-panel">
+  <div class="cart-panel-header">
+    <div class="cart-panel-title">🛒 Your Basket</div>
+    <button class="cart-close" onclick="toggleCart()">✕</button>
+  </div>
+  <div style="font-size:0.75rem; color:rgba(255,255,255,0.4); margin-bottom:0.8rem; padding-bottom:0.8rem; border-bottom:1px solid var(--border);">
+    💡 Items grouped by shop — ek saath deliver honge
+  </div>
+  <div class="cart-items" id="cart-items"></div>
+  <div class="cart-footer" id="cart-footer" style="display:none;">
+    <div class="cart-total-row"><span>Subtotal</span><span id="cart-subtotal">₹0</span></div>
+    <div class="cart-total-row"><span>Delivery Fee (shared)</span><span id="cart-delivery">₹40</span></div>
+    <div class="cart-total-row grand"><span>Total</span><span id="cart-total">₹0</span></div>
+    <div style="margin-top:1rem;">
+      <label class="form-label">Delivery Address</label>
+      <textarea id="cart-address" class="form-input" rows="2" placeholder="Makan 42, Mukhya Gali, Khandwa" style="font-size:0.85rem;"></textarea>
+    </div>
+    <button class="btn-primary" style="margin-top:1rem;" onclick="placeOrder()">
+      🚖 Place Multi-Shop Order
+    </button>
+  </div>
+</div>
+
+<!-- VILLAGE SELECTION MODAL -->
+<div class="modal-overlay" id="village-modal">
+  <div class="modal">
+    <h2 class="modal-title">🏡 Apna Gaanv Select Karein</h2>
+    <p class="modal-sub">Aap kis gaanv mein rehte hain? Hum aapke nazdeeki town se connect kar denge.</p>
+
+    <label class="form-label">Search village</label>
+    <input type="text" id="village-search" class="form-input" placeholder="Gaanv ka naam..." oninput="renderVillageOptions()">
+
+    <div class="village-grid" id="village-grid"></div>
+
+    <div style="margin-top:1rem; padding:0.8rem; background:rgba(245,166,35,0.06); border:1px dashed rgba(245,166,35,0.3); border-radius:10px; font-size:0.8rem; color:rgba(255,255,255,0.6);">
+      💡 Future mein aap live GPS se auto-detect hoga. Demo ke liye manually select karein.
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-primary" id="confirm-village-btn" onclick="confirmVillage()">Connect My Village 🚀</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+
+<script src="../js/data.js"></script>
+<script>
+const session = requireAuth('customer');
+if (!session) throw new Error('no auth');
+
+// ═══════════════════════════════════════════
+// VILLAGE → TOWN MAPPING (core logic!)
+// ═══════════════════════════════════════════
+// Each village is mapped to nearest town.
+// Shops from THAT TOWN show to customer.
+const VILLAGE_TOWN_MAP = {
+  'Khandwa':       { town: 'Burhanpur',  district: 'Madhya Pradesh', driveTime: '35 min' },
+  'Rampur':        { town: 'Meerut',     district: 'Uttar Pradesh', driveTime: '45 min' },
+  'Ankleshwar Gaon': { town: 'Ankleshwar', district: 'Gujarat', driveTime: '20 min' },
+  'Bhilwara Gaon': { town: 'Bhilwara',   district: 'Rajasthan', driveTime: '30 min' },
+  'Barauli':       { town: 'Aligarh',    district: 'Uttar Pradesh', driveTime: '50 min' },
+  'Chandpur':      { town: 'Varanasi',   district: 'Uttar Pradesh', driveTime: '40 min' }
+};
+
+// Also add villages that match shops' registered village
+getAllMerchants().forEach(m => {
+  if (!VILLAGE_TOWN_MAP[m.village]) {
+    VILLAGE_TOWN_MAP[m.village] = { town: m.village + ' Town', district: 'Local', driveTime: '15-30 min' };
+  }
+});
+
+let currentVillage = session.village || null;
+let currentTown = null;
+let currentShopView = null;  // null = shop list, else merchantId
+let selectedVillage = null;
+let cart = JSON.parse(localStorage.getItem('bn_cart_' + session.id) || '[]');
+
+// Init
+document.getElementById('user-name').textContent = session.name;
+document.getElementById('user-avatar').textContent = session.name.charAt(0).toUpperCase();
+document.getElementById('profile-name').textContent = session.name;
+document.getElementById('profile-avatar').textContent = session.name.charAt(0).toUpperCase();
+document.getElementById('profile-phone').textContent = '+91 ' + session.phone;
+
+// If no village, force modal
+if (!currentVillage) {
+  setTimeout(openVillageModal, 300);
+} else {
+  setVillage(currentVillage);
+}
+
+function saveCart() {
+  localStorage.setItem('bn_cart_' + session.id, JSON.stringify(cart));
+  updateCartUI();
+}
+
+function switchPage(p) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + p).classList.add('active');
+  document.querySelectorAll('.nav-item[data-page]').forEach(n => n.classList.remove('active'));
+  document.querySelector(`.nav-item[data-page="${p}"]`).classList.add('active');
+  document.getElementById('sidebar').classList.remove('open');
+  if (p === 'orders') renderOrders();
+}
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+
+// ═══════════ VILLAGE LOGIC ═══════════
+function openVillageModal() {
+  selectedVillage = currentVillage;
+  document.getElementById('village-modal').classList.add('open');
+  renderVillageOptions();
+}
+function closeVillageModal() { document.getElementById('village-modal').classList.remove('open'); }
+
+function renderVillageOptions() {
+  const search = document.getElementById('village-search').value.toLowerCase();
+  const villages = Object.keys(VILLAGE_TOWN_MAP);
+  const filtered = search ? villages.filter(v => v.toLowerCase().includes(search)) : villages;
+  const grid = document.getElementById('village-grid');
+  grid.innerHTML = filtered.map(v => {
+    const t = VILLAGE_TOWN_MAP[v];
+    return `<div class="village-option ${selectedVillage === v ? 'selected' : ''}" onclick="selectVillageOption('${v}')">
+      <strong>🏡 ${v}</strong>
+      <span>→ ${t.town} (${t.driveTime})</span>
+    </div>`;
+  }).join('');
+}
+function selectVillageOption(v) {
+  selectedVillage = v;
+  renderVillageOptions();
+}
+function confirmVillage() {
+  if (!selectedVillage) return toast('Please select your village', 'error');
+  setVillage(selectedVillage);
+  closeVillageModal();
+  toast(`Connected ${selectedVillage} → ${currentTown.town}! 🔗`, 'success');
+  // Save to user
+  session.village = selectedVillage;
+  setSession(session);
+  updateUser(session.id, { village: selectedVillage }, 'customer');
+}
+
+function setVillage(v) {
+  currentVillage = v;
+  currentTown = VILLAGE_TOWN_MAP[v];
+
+  // Update UI
+  document.getElementById('hero-village-name').textContent = '🏡 ' + v;
+  document.getElementById('hero-connected-town').innerHTML =
+    `Connected to <strong style="color:var(--orange);">${currentTown.town}</strong> (${currentTown.driveTime} away) • ${currentTown.district}`;
+  document.getElementById('flow-village').textContent = v;
+  document.getElementById('flow-village-sub').textContent = 'Aapka gaanv';
+  document.getElementById('flow-town').textContent = '🏙️ ' + currentTown.town;
+  document.getElementById('flow-town-sub').textContent = currentTown.district;
+  document.getElementById('user-village').textContent = '📍 ' + v;
+  document.getElementById('profile-village').textContent = v;
+  document.getElementById('profile-town').textContent = currentTown.town + ' (' + currentTown.driveTime + ')';
+
+  currentShopView = null;
+  renderShopView();
+}
+
+// ═══════════ SHOP VIEW ═══════════
+function renderShopView() {
+  const container = document.getElementById('shop-view-container');
+  if (!currentVillage) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🏡</div><div class="empty-state-title">Please select your village first</div></div>`;
+    return;
+  }
+
+  if (currentShopView) {
+    renderShopDetail(currentShopView);
+  } else {
+    renderShopList();
+  }
+}
+
+function renderShopList() {
+  const container = document.getElementById('shop-view-container');
+  // Get shops from the connected town. For demo:
+  // Match shops where village matches OR all shops (since shops are in nearby town)
+  const allMerchants = getAllMerchants().filter(m => m.products && m.products.length > 0);
+
+  if (allMerchants.length === 0) {
+    container.innerHTML = `<div class="empty-state">
+      <div class="empty-state-icon">🏪</div>
+      <div class="empty-state-title">No shops available yet</div>
+      <div class="empty-state-text">Jaldi hi ${currentTown.town} ke shops yahan available honge.</div>
+    </div>`;
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="shop-list" id="shop-list"></div>
+  `;
+
+  document.getElementById('shop-list').innerHTML = allMerchants.map(m => {
+    const verified = m.gstVerified && m.faceVerified;
+    const emoji = m.category.includes('Med') ? '💊' : m.category.includes('Dairy') ? '🥛' : m.category.includes('Stat') ? '📚' : m.category.includes('General') ? '🏪' : '🛒';
+    const catClass = (m.category.split('/')[0].trim().split(' ')[0]).replace(/[^a-zA-Z]/g,'');
+    const catProductsInCart = cart.filter(i => i.merchantId === m.id).length;
+    return `
+      <div class="shop-browse-card ${!verified ? 'unverified' : ''}" onclick="openShop('${m.id}')">
+        <div class="shop-browse-top">
+          <div class="shop-browse-avatar" style="background: linear-gradient(135deg, var(--green), var(--green-light));">${emoji}</div>
+          <div style="flex:1; min-width:0;">
+            <div class="shop-browse-name">${m.shopName}</div>
+            <div class="shop-browse-owner">👤 ${m.name}</div>
+            <span class="shop-browse-cat cat-${catClass}">${m.category}</span>
+          </div>
+        </div>
+        <div style="font-size:0.8rem; color:rgba(255,255,255,0.55); margin-bottom:0.5rem; line-height:1.5;">
+          📍 Based in <b style="color:var(--orange);">${m.village}</b> • serves your area
+        </div>
+        <div class="shop-browse-meta">
+          <span>⭐ <b>${m.rating.toFixed(1)}</b></span>
+          <span>📦 ${m.products.length} products</span>
+          ${verified
+            ? '<span style="color:var(--green-light); font-weight:700;">✓ Verified</span>'
+            : '<span style="color:#E8541A;">⚠ Unverified</span>'}
+          ${catProductsInCart > 0 ? `<span style="color:var(--gold); font-weight:700;">🛒 ${catProductsInCart} in cart</span>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function openShop(mid) {
+  currentShopView = mid;
+  renderShopView();
+}
+function backToShops() {
+  currentShopView = null;
+  renderShopView();
+}
+
+function renderShopDetail(mid) {
+  const m = getUserById(mid, 'merchant');
+  if (!m) { backToShops(); return; }
+
+  const verified = m.gstVerified && m.faceVerified;
+  const emoji = m.category.includes('Med') ? '💊' : m.category.includes('Dairy') ? '🥛' : m.category.includes('Stat') ? '📚' : m.category.includes('General') ? '🏪' : '🛒';
+
+  const container = document.getElementById('shop-view-container');
+
+  const shopCartItems = cart.filter(c => c.merchantId === mid);
+  const shopCartTotal = shopCartItems.reduce((s, i) => s + i.price * i.qty, 0);
+
+  container.innerHTML = `
+    <div class="shop-view-header">
+      <button class="back-to-shops" onclick="backToShops()">← All Shops</button>
+      <div style="display:flex; gap:1rem; align-items:center; flex:1; min-width:250px; flex-wrap:wrap;">
+        <div style="font-size:3rem;">${emoji}</div>
+        <div>
+          <h2 style="font-size:1.4rem; font-weight:800;">${m.shopName}</h2>
+          <p style="color:rgba(255,255,255,0.6); font-size:0.85rem;">👤 ${m.name} • ⭐ ${m.rating.toFixed(1)} • ${m.category}</p>
+          <div style="margin-top:4px;">
+            ${verified
+              ? '<span style="color:var(--green-light); font-size:0.8rem; font-weight:700;">✓ GST + Face Verified Shop</span>'
+              : '<span style="color:#E8541A; font-size:0.8rem;">⚠ Not verified yet</span>'}
+          </div>
+        </div>
+      </div>
+      ${shopCartItems.length > 0 ? `
+        <div style="background:rgba(232,84,26,0.1); border:1px solid rgba(232,84,26,0.3); padding:0.6rem 1rem; border-radius:10px; font-size:0.85rem;">
+          <div style="color:rgba(255,255,255,0.5); font-size:0.7rem; text-transform:uppercase; letter-spacing:1px;">In your cart</div>
+          <div style="color:var(--gold); font-weight:700; font-size:1rem;">${shopCartItems.length} items • ${fmtPrice(shopCartTotal)}</div>
+        </div>
+      ` : ''}
+    </div>
+
+    <div style="margin-bottom:1rem; display:flex; gap:0.6rem; flex-wrap:wrap;">
+      <button class="btn-outline" style="border-color:var(--green); color:var(--green-light);" onclick="backToShops()">← Back to all shops</button>
+    </div>
+
+    <h3 style="margin-bottom:1rem; font-weight:700;">📦 Available Products (${m.products.length})</h3>
+    <div class="grid-cards" id="shop-products"></div>
+  `;
+
+  const grid = document.getElementById('shop-products');
+  grid.innerHTML = m.products.map(p => {
+    const inCart = cart.find(c => c.productId === p.id && c.merchantId === mid);
+    const stockClass = p.stock === 0 ? 'out' : p.stock < 10 ? 'low' : '';
+    const stockText = p.stock === 0 ? 'Out of stock' : p.stock < 10 ? `Only ${p.stock} left!` : '✓ In Stock';
+    return `
+      <div class="product-card">
+        <div class="product-img">${p.emoji || '📦'}</div>
+        <div class="product-name">${p.name}</div>
+        <div class="product-shop">🏪 ${m.shopName}</div>
+        <div class="product-price">${fmtPrice(p.price)}</div>
+        <div class="product-stock ${stockClass}">${stockText}</div>
+        <div class="product-actions">
+          ${inCart ? `
+            <div style="flex:1; display:flex; align-items:center; justify-content:center; gap:0.5rem; background:rgba(232,84,26,0.1); border-radius:8px; padding:4px;">
+              <button class="qty-btn" onclick="changeQty('${mid}','${p.id}',-1)">−</button>
+              <span style="font-weight:700;">${inCart.qty}</span>
+              <button class="qty-btn" onclick="changeQty('${mid}','${p.id}',1)" ${p.stock <= inCart.qty ? 'disabled style="opacity:0.3"' : ''}>+</button>
+            </div>
+          ` : `
+            <button class="btn-add-cart" onclick="addToCart('${mid}','${p.id}')" ${p.stock === 0 ? 'disabled' : ''}>+ Add</button>
+          `}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ═══════════ CART ═══════════
+function addToCart(mid, pid) {
+  const m = getUserById(mid, 'merchant');
+  const p = m.products.find(x => x.id === pid);
+  if (!p) return toast('Product not found', 'error');
+  if (p.stock === 0) return toast('Out of stock', 'error');
+
+  const existing = cart.find(c => c.productId === pid && c.merchantId === mid);
+  if (existing) {
+    if (existing.qty >= p.stock) return toast('No more stock available', 'error');
+    existing.qty++;
+  } else {
+    cart.push({
+      productId: pid,
+      merchantId: mid,
+      name: p.name,
+      price: p.price,
+      emoji: p.emoji,
+      shopName: m.shopName,
+      qty: 1
+    });
+  }
+  saveCart();
+  if (currentShopView === mid) renderShopView();
+  else renderShopList();
+  toast(p.name + ' added! 🛒');
+}
+
+function changeQty(mid, pid, delta) {
+  const item = cart.find(c => c.productId === pid && c.merchantId === mid);
+  if (!item) return;
+  const m = getUserById(mid, 'merchant');
+  const p = m.products.find(x => x.id === pid);
+  const newQty = item.qty + delta;
+  if (delta > 0 && newQty > p.stock) return toast('No more stock', 'error');
+  if (newQty <= 0) {
+    cart = cart.filter(c => !(c.productId === pid && c.merchantId === mid));
+  } else {
+    item.qty = newQty;
+  }
+  saveCart();
+  if (currentShopView === mid) renderShopView();
+  else renderShopList();
+}
+
+function updateCartUI() {
+  const count = cart.reduce((s, i) => s + i.qty, 0);
+  document.getElementById('cart-badge').textContent = count;
+  document.getElementById('cart-count-mini').textContent = count;
+  renderCartItems();
+}
+
+function renderCartItems() {
+  const wrap = document.getElementById('cart-items');
+  const footer = document.getElementById('cart-footer');
+  if (cart.length === 0) {
+    wrap.innerHTML = `<div class="cart-empty">
+      <div class="cart-empty-icon">🛒</div>
+      <div>Cart is empty</div>
+      <div style="font-size:0.8rem; margin-top:0.3rem;">Products add karo — alag-alag dukaanon se!</div>
+    </div>`;
+    footer.style.display = 'none';
+    return;
+  }
+  footer.style.display = 'block';
+
+  // Group by merchant
+  const byMerchant = {};
+  cart.forEach(i => {
+    if (!byMerchant[i.merchantId]) {
+      byMerchant[i.merchantId] = { shopName: i.shopName, items: [] };
+    }
+    byMerchant[i.merchantId].items.push(i);
+  });
+
+  wrap.innerHTML = Object.entries(byMerchant).map(([mid, data]) => `
+    <div style="margin-bottom:1rem;">
+      <div style="font-size:0.75rem; color:var(--green-light); font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-bottom:0.5rem; padding-bottom:6px; border-bottom:1px solid var(--border);">
+        🏪 ${data.shopName}
+      </div>
+      ${data.items.map(i => `
+        <div class="cart-item">
+          <div class="cart-item-img">${i.emoji}</div>
+          <div class="cart-item-info">
+            <div class="cart-item-name">${i.name}</div>
+            <div class="cart-item-price">${fmtPrice(i.price)} each</div>
+          </div>
+          <div class="qty-controls">
+            <button class="qty-btn" onclick="changeQty('${mid}','${i.productId}',-1)">−</button>
+            <span class="qty-val">${i.qty}</span>
+            <button class="qty-btn" onclick="changeQty('${mid}','${i.productId}',1)">+</button>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+
+  const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const delivery = subtotal > 500 ? 20 : 40;
+  document.getElementById('cart-subtotal').textContent = fmtPrice(subtotal);
+  document.getElementById('cart-delivery').textContent = fmtPrice(delivery);
+  document.getElementById('cart-total').textContent = fmtPrice(subtotal + delivery);
+}
+
+function toggleCart() {
+  document.getElementById('cart-panel').classList.toggle('open');
+}
+
+function placeOrder() {
+  const address = document.getElementById('cart-address').value.trim();
+  if (!address) return toast('Delivery address daalo!', 'error');
+  if (cart.length === 0) return toast('Cart khali hai', 'error');
+
+  const order = createOrder(session.id, cart, address);
+  cart = [];
+  saveCart();
+  toggleCart();
+
+  if (!session.addresses) session.addresses = [];
+  if (!session.addresses.includes(address)) session.addresses.push(address);
+  updateUser(session.id, { addresses: session.addresses }, 'customer');
+
+  toast(`Order ${order.id} placed! 🎉 ${currentTown.town} se delivery aaj hi aayegi!`, 'success');
+  setTimeout(() => switchPage('orders'), 800);
+}
+
+// ═══════════ ORDERS ═══════════
+function renderOrders() {
+  const orders = getOrdersByCustomer(session.id);
+  const wrap = document.getElementById('orders-list');
+  if (orders.length === 0) {
+    wrap.innerHTML = `<div class="empty-state">
+      <div class="empty-state-icon">📦</div>
+      <div class="empty-state-title">Abhi tak koi order nahi</div>
+      <div class="empty-state-text">Apne nearby town ke shops se shopping shuru karo!</div>
+      <button class="btn-primary" style="width:auto; padding:10px 24px; margin-top:1rem;" onclick="switchPage('browse')">🛒 Browse Shops</button>
+    </div>`;
+    return;
+  }
+  wrap.innerHTML = orders.map(o => `
+    <div class="order-card ${o.status}">
+      <div class="order-header">
+        <div class="order-id">${o.id}</div>
+        <span class="order-status status-${o.status}">${o.status}</span>
+      </div>
+      <div class="order-meta">🗓️ ${fmtDate(o.createdAt)} • 📍 ${o.address}</div>
+
+      ${(() => {
+        // Group by shop
+        const groups = {};
+        o.items.forEach(i => {
+          if (!groups[i.shopName]) groups[i.shopName] = [];
+          groups[i.shopName].push(i);
+        });
+        return Object.entries(groups).map(([shop, items]) => `
+          <div style="margin-top:0.6rem; margin-bottom:0.6rem;">
+            <div style="font-size:0.78rem; font-weight:700; color:var(--green-light); margin-bottom:4px;">🏪 ${shop}</div>
+            ${items.map(i => `<div style="padding-left:0.8rem; font-size:0.85rem; color:rgba(255,255,255,0.75);">• ${i.name} × ${i.qty} — ${fmtPrice(i.price * i.qty)}</div>`).join('')}
+          </div>
+        `).join('');
+      })()}
+
+      <div class="order-footer">
+        <div style="font-size:0.75rem; color:rgba(255,255,255,0.4);">
+          Items: ${o.items.reduce((s,i)=>s+i.qty,0)} • Delivery: ${fmtPrice(o.deliveryFee)}
+          <br>🚖 From <span style="color:var(--orange);">${currentTown ? currentTown.town : 'town'}</span> → ${currentVillage || 'village'}
+        </div>
+        <div class="order-total">${fmtPrice(o.total)}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+renderCartItems();
+</script>
+</body>
+</html>
