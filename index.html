@@ -183,6 +183,22 @@
     .mini-stat b { font-size: 1.6rem; }
   }
 </style>
+<!-- PWA Meta Tags -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#E8541A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+<!-- Service Worker Register Script -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then(reg => console.log('App Ready!'))
+        .catch(err => console.log('Error:', err));
+    });
+  }
+</script>
 </head>
 <body>
 
