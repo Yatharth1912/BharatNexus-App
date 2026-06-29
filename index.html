@@ -199,6 +199,30 @@
     });
   }
 </script>
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
+<script>
+  // Tera Real Firebase Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyC5vlxlvVZ_mUHuUOg_PsTq0yMTRAgzQDk",
+    authDomain: "bharat-nexus-c4101.firebaseapp.com",
+    projectId: "bharat-nexus-c4101",
+    storageBucket: "bharat-nexus-c4101.firebasestorage.app",
+    messagingSenderId: "943312594136",
+    appId: "1:943312594136:web:3caf853f162e9113f963ad"
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  
+  // Persistence taaki login session bana rahe
+  firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+</script>
 </head>
 <body>
 

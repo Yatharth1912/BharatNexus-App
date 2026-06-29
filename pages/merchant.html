@@ -7,68 +7,43 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/style.css">
 <style>
-/* ═══════════ IMAGE UPLOAD STYLES ═══════════ */
-#img-preview-box {
-  transition: border-color 0.3s, background 0.3s;
-}
-#img-preview-box:hover {
-  border-color: rgba(245,166,35,0.4) !important;
-  background: rgba(255,255,255,0.05) !important;
-}
-#img-remove-btn {
-  display: none;
-  align-items: center;
-  justify-content: center;
-}
-.upload-label {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 10px;
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  color: rgba(255,255,255,0.8);
-  transition: all 0.2s;
-}
-.upload-label:hover {
-  transform: translateY(-1px);
-}
-.upload-label-gallery {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.15);
-}
-.upload-label-gallery:hover {
-  background: rgba(255,255,255,0.12);
-}
-.upload-label-camera {
-  background: rgba(245,166,35,0.08);
-  border: 1px solid rgba(245,166,35,0.25);
-}
-.upload-label-camera:hover {
-  background: rgba(245,166,35,0.18);
-}
-.product-img-box {
-  width: 100%;
-  height: 140px;
-  border-radius: 12px;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255,255,255,0.04);
-  margin-bottom: 0.8rem;
-}
-.product-img-box img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.product-img-box .product-emoji {
-  font-size: 3rem;
-}
+#img-preview-box { transition: border-color 0.3s, background 0.3s; }
+#img-preview-box:hover { border-color: rgba(245,166,35,0.4) !important; background: rgba(255,255,255,0.05) !important; }
+#img-remove-btn { display: none; align-items: center; justify-content: center; }
+.upload-label { display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 10px; border-radius: 12px; cursor: pointer; font-size: 0.85rem; color: rgba(255,255,255,0.8); transition: all 0.2s; }
+.upload-label:hover { transform: translateY(-1px); }
+.upload-label-gallery { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); }
+.upload-label-gallery:hover { background: rgba(255,255,255,0.12); }
+.upload-label-camera { background: rgba(245,166,35,0.08); border: 1px solid rgba(245,166,35,0.25); }
+.upload-label-camera:hover { background: rgba(245,166,35,0.18); }
+.product-img-box { width: 100%; height: 140px; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.04); margin-bottom: 0.8rem; }
+.product-img-box img { width: 100%; height: 100%; object-fit: cover; }
+.product-img-box .product-emoji { font-size: 3rem; }
+
+/* Loader */
+.cloud-loader { display:flex; align-items:center; justify-content:center; padding:3rem; color:rgba(255,255,255,0.5); }
+.cloud-loader::before { content:''; width:20px; height:20px; border:2px solid rgba(245,166,35,0.3); border-top-color:#F5A623; border-radius:50%; animation:spin 0.8s linear infinite; margin-right:10px; }
+@keyframes spin { to { transform: rotate(360deg); } }
 </style>
+
+<!-- ═══════════ FIREBASE SDKs ═══════════ -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyC5vlxlvVZ_mUHuUOg_PsTq0yMTRAgzQDk",
+    authDomain: "bharat-nexus-c4101.firebaseapp.com",
+    projectId: "bharat-nexus-c4101",
+    storageBucket: "bharat-nexus-c4101.firebasestorage.app",
+    messagingSenderId: "943312594136",
+    appId: "1:943312594136:web:3caf853f162e9113f963ad"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+</script>
 </head>
 <body>
 
@@ -143,7 +118,7 @@
       </div>
 
       <h3 style="margin-bottom:1rem;">Recent Orders</h3>
-      <div id="recent-orders"></div>
+      <div id="recent-orders"><div class="cloud-loader">Loading from cloud...</div></div>
     </div>
 
     <!-- PRODUCTS -->
@@ -159,10 +134,10 @@
 
       <div class="search-bar">
         <input type="text" class="search-input" id="prod-search"
-          placeholder="🔍 Search products..." oninput="renderProducts()">
+          placeholder="🔍 Search products..." oninput="renderProductsUI()">
       </div>
 
-      <div id="products-list"></div>
+      <div id="products-list"><div class="cloud-loader">Loading products from cloud...</div></div>
     </div>
 
     <!-- ORDERS -->
@@ -178,7 +153,7 @@
         <button class="tab-btn" onclick="filterOrders(this,'pending')">Pending</button>
         <button class="tab-btn" onclick="filterOrders(this,'completed')">Completed</button>
       </div>
-      <div id="merchant-orders"></div>
+      <div id="merchant-orders"><div class="cloud-loader">Loading orders...</div></div>
     </div>
 
     <!-- SHOP PROFILE -->
@@ -198,27 +173,22 @@
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
           <div>
             <label class="form-label">Owner Name</label>
-            <div style="padding:10px 14px; background:rgba(255,255,255,0.04);
-              border-radius:10px; font-size:0.9rem;" id="sp-owner">-</div>
+            <div style="padding:10px 14px; background:rgba(255,255,255,0.04); border-radius:10px; font-size:0.9rem;" id="sp-owner">-</div>
           </div>
           <div>
             <label class="form-label">Phone</label>
-            <div style="padding:10px 14px; background:rgba(255,255,255,0.04);
-              border-radius:10px; font-size:0.9rem;" id="sp-phone">-</div>
+            <div style="padding:10px 14px; background:rgba(255,255,255,0.04); border-radius:10px; font-size:0.9rem;" id="sp-phone">-</div>
           </div>
           <div>
             <label class="form-label">Village / Town</label>
-            <div style="padding:10px 14px; background:rgba(255,255,255,0.04);
-              border-radius:10px; font-size:0.9rem;" id="sp-village">-</div>
+            <div style="padding:10px 14px; background:rgba(255,255,255,0.04); border-radius:10px; font-size:0.9rem;" id="sp-village">-</div>
           </div>
           <div>
             <label class="form-label">Rating</label>
-            <div style="padding:10px 14px; background:rgba(255,255,255,0.04);
-              border-radius:10px; font-size:0.9rem; color:#F5A623;" id="sp-rating">-</div>
+            <div style="padding:10px 14px; background:rgba(255,255,255,0.04); border-radius:10px; font-size:0.9rem; color:#F5A623;" id="sp-rating">-</div>
           </div>
         </div>
-        <div style="margin-top:1.5rem; padding:1rem; border-radius:12px;
-          text-align:center; font-size:0.9rem;" id="verification-status"></div>
+        <div style="margin-top:1.5rem; padding:1rem; border-radius:12px; text-align:center; font-size:0.9rem;" id="verification-status"></div>
         <div id="verify-action" style="margin-top:1rem;"></div>
       </div>
     </div>
@@ -232,130 +202,48 @@
     <h2 class="modal-title" id="modal-title">Add New Product</h2>
     <p class="modal-sub" id="modal-sub">List a new product on your shop</p>
 
-    <!-- Emoji -->
     <div class="form-group">
       <label class="form-label">Product Emoji (visual icon)</label>
-      <input type="text" id="p-emoji" class="form-input"
-        placeholder="🌾 🥛 💊 etc." maxlength="2"
-        style="font-size:1.5rem; text-align:center;">
+      <input type="text" id="p-emoji" class="form-input" placeholder="🌾 🥛 💊 etc." maxlength="2" style="font-size:1.5rem; text-align:center;">
     </div>
 
-    <!-- ✅ IMAGE UPLOAD SECTION -->
+    <!-- IMAGE UPLOAD -->
     <div class="form-group">
       <label class="form-label">Product Image (Optional)</label>
-
-      <!-- Preview Box -->
-      <div id="img-preview-box"
-        style="
-          width:100%;
-          height:180px;
-          border:2px dashed rgba(255,255,255,0.2);
-          border-radius:16px;
-          display:flex;
-          flex-direction:column;
-          align-items:center;
-          justify-content:center;
-          margin-bottom:0.8rem;
-          overflow:hidden;
-          background:rgba(255,255,255,0.03);
-          cursor:pointer;
-          position:relative;
-        "
-        onclick="document.getElementById('img-gallery').click()">
-
-        <!-- Preview Image -->
-        <img id="img-preview" src="" alt="preview"
-          style="display:none; width:100%; height:100%; object-fit:cover; border-radius:14px;">
-
-        <!-- Placeholder -->
-        <div id="img-placeholder"
-          style="text-align:center; color:rgba(255,255,255,0.4); pointer-events:none;">
+      <div id="img-preview-box" style="width:100%; height:180px; border:2px dashed rgba(255,255,255,0.2); border-radius:16px; display:flex; flex-direction:column; align-items:center; justify-content:center; margin-bottom:0.8rem; overflow:hidden; background:rgba(255,255,255,0.03); cursor:pointer; position:relative;" onclick="document.getElementById('img-gallery').click()">
+        <img id="img-preview" src="" alt="preview" style="display:none; width:100%; height:100%; object-fit:cover; border-radius:14px;">
+        <div id="img-placeholder" style="text-align:center; color:rgba(255,255,255,0.4); pointer-events:none;">
           <div style="font-size:2.5rem; margin-bottom:0.5rem;">🖼️</div>
           <div style="font-size:0.85rem;">Click to select image</div>
-          <div style="font-size:0.75rem; margin-top:0.3rem; opacity:0.6;">
-            JPG, PNG, WEBP • Max 5MB
-          </div>
+          <div style="font-size:0.75rem; margin-top:0.3rem; opacity:0.6;">JPG, PNG, WEBP • Max 1MB</div>
         </div>
-
-        <!-- Remove Button -->
-        <button id="img-remove-btn"
-          onclick="removeImage(event)"
-          style="
-            position:absolute;
-            top:8px;
-            right:8px;
-            background:rgba(192,57,43,0.9);
-            border:none;
-            border-radius:50%;
-            width:30px;
-            height:30px;
-            cursor:pointer;
-            font-size:0.85rem;
-            color:white;
-            z-index:10;
-            font-weight:700;
-          ">✕</button>
-
+        <button id="img-remove-btn" onclick="removeImage(event)" style="position:absolute; top:8px; right:8px; background:rgba(192,57,43,0.9); border:none; border-radius:50%; width:30px; height:30px; cursor:pointer; font-size:0.85rem; color:white; z-index:10; font-weight:700;">✕</button>
       </div>
 
-      <!-- Upload Buttons Row -->
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.8rem;">
-
-        <!-- Gallery -->
         <label class="upload-label upload-label-gallery">
           <span style="font-size:1.2rem;">🖼️</span>
           <span>Gallery</span>
-          <input type="file" id="img-gallery" accept="image/*"
-            style="display:none;" onchange="handleImageSelect(this)">
+          <input type="file" id="img-gallery" accept="image/*" style="display:none;" onchange="handleImageSelect(this)">
         </label>
-
-        <!-- Camera -->
         <label class="upload-label upload-label-camera">
           <span style="font-size:1.2rem;">📷</span>
           <span>Camera</span>
-          <input type="file" id="img-camera" accept="image/*"
-            capture="environment" style="display:none;"
-            onchange="handleImageSelect(this)">
+          <input type="file" id="img-camera" accept="image/*" capture="environment" style="display:none;" onchange="handleImageSelect(this)">
         </label>
-
       </div>
 
-      <!-- Size Warning -->
-      <div id="img-size-warning"
-        style="
-          display:none;
-          margin-top:0.6rem;
-          padding:8px 12px;
-          background:rgba(192,57,43,0.15);
-          border:1px solid rgba(192,57,43,0.3);
-          border-radius:8px;
-          font-size:0.78rem;
-          color:#E8541A;
-        ">
-        ⚠ Image too large! Max 5MB allowed. Please choose a smaller image.
+      <div id="img-size-warning" style="display:none; margin-top:0.6rem; padding:8px 12px; background:rgba(192,57,43,0.15); border:1px solid rgba(192,57,43,0.3); border-radius:8px; font-size:0.78rem; color:#E8541A;">
+        ⚠ Image too large! Max 1MB allowed for cloud storage.
       </div>
-
-      <!-- Selected File Name -->
-      <div id="img-file-name"
-        style="
-          display:none;
-          margin-top:0.5rem;
-          font-size:0.78rem;
-          color:rgba(255,255,255,0.4);
-          text-align:center;
-        ">
-      </div>
-
+      <div id="img-file-name" style="display:none; margin-top:0.5rem; font-size:0.78rem; color:rgba(255,255,255,0.4); text-align:center;"></div>
     </div>
-    <!-- ✅ IMAGE SECTION END -->
 
-    <!-- Product Name -->
     <div class="form-group">
       <label class="form-label">Product Name</label>
       <input type="text" id="p-name" class="form-input" placeholder="e.g. Aata 5kg">
     </div>
 
-    <!-- Price & Stock -->
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
       <div class="form-group">
         <label class="form-label">Price (₹)</label>
@@ -367,29 +255,20 @@
       </div>
     </div>
 
-    <!-- Category -->
     <div class="form-group">
       <label class="form-label">Category</label>
       <select id="p-category" class="form-input">
-        <option>Grocery</option>
-        <option>Dairy</option>
-        <option>Medicine</option>
-        <option>Personal Care</option>
-        <option>Snacks</option>
-        <option>Stationery</option>
-        <option>Household</option>
-        <option>Fruits & Vegetables</option>
-        <option>Clothing</option>
-        <option>Other</option>
+        <option>Grocery</option><option>Dairy</option><option>Medicine</option>
+        <option>Personal Care</option><option>Snacks</option><option>Stationery</option>
+        <option>Household</option><option>Fruits & Vegetables</option>
+        <option>Clothing</option><option>Other</option>
       </select>
     </div>
 
-    <!-- Modal Actions -->
     <div class="modal-actions">
       <button class="btn-outline" style="flex:1;" onclick="closeModal()">Cancel</button>
-      <button class="btn-primary" style="flex:2;" onclick="saveProduct()">Save Product</button>
+      <button class="btn-primary" style="flex:2;" id="save-btn" onclick="saveProduct()">Save Product</button>
     </div>
-
   </div>
 </div>
 
@@ -397,100 +276,177 @@
 
 <script src="../js/data.js"></script>
 <script>
+// ═══════════════════════════════════════════════════════════════
+// BHARAT NEXUS - MERCHANT DASHBOARD (FIREBASE CLOUD VERSION)
+// ═══════════════════════════════════════════════════════════════
+
 const session = requireAuth('merchant');
 if (!session) throw new Error('no auth');
 
+// ═══════════ GLOBAL STATE ═══════════
 let editingId = null;
 let orderFilter = 'all';
-let merchant = getUserById(session.id, 'merchant');
-
-// ═══════════ IMAGE VARIABLES ═══════════
 let currentImageBase64 = null;
+
+// In-memory data (cloud se aayega)
+let merchant = {
+  name: session.name,
+  shopName: 'My Shop',
+  village: '',
+  category: '',
+  phone: '',
+  rating: 0,
+  gstVerified: false,
+  faceVerified: false,
+  products: [],
+  orders: []
+};
+
+// ═══════════ TOAST ═══════════
+function toast(msg, type = 'info') {
+  const c = document.getElementById('toast-container');
+  if (!c) { alert(msg); return; }
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+// ═══════════ UTILS ═══════════
+function fmtPrice(n) { return '₹' + Number(n || 0).toLocaleString('en-IN'); }
+function fmtDate(ts) {
+  if (!ts) return 'Just now';
+  const d = ts.seconds ? new Date(ts.seconds * 1000) : new Date(ts);
+  return d.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+}
 
 // ═══════════ INIT UI ═══════════
 document.getElementById('user-name').textContent = session.name;
 document.getElementById('user-avatar').textContent = session.name.charAt(0).toUpperCase();
 document.getElementById('greeting').textContent = `Namaste, ${session.name}! 🙏`;
-document.getElementById('shop-subtitle').textContent = merchant.shopName + ' • ' + merchant.village;
 
-// Verification badge
-const verified = merchant.gstVerified && merchant.faceVerified;
-const badge = document.getElementById('verify-badge');
-if (verified) {
-  badge.className = 'sidebar-verified';
-  badge.textContent = '✓ Verified Shop';
-} else {
-  badge.className = 'sidebar-verified unverified';
-  badge.innerHTML = '⚠ <a href="security.html" style="color:#E8541A;">Verify Now</a>';
+// ═══════════ CLOUD: LOAD MERCHANT PROFILE ═══════════
+async function loadMerchantProfile() {
+  try {
+    const doc = await db.collection('merchants').doc(session.id).get();
+    if (doc.exists) {
+      merchant = { ...merchant, ...doc.data() };
+    } else {
+      // Pehli baar login - profile create karo
+      await db.collection('merchants').doc(session.id).set({
+        name: session.name,
+        shopName: session.shopName || 'My Shop',
+        village: session.village || '',
+        category: session.category || 'Grocery',
+        phone: session.phone || '',
+        rating: 0,
+        gstVerified: false,
+        faceVerified: false,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+    updateUIFromProfile();
+  } catch (e) {
+    console.error('Profile load error:', e);
+    toast('Could not load profile', 'error');
+  }
 }
 
-// Verify banner on dashboard
-const banner = document.getElementById('verify-banner');
-if (!verified) {
-  banner.innerHTML = `
-    <div style="
-      background:linear-gradient(135deg,rgba(192,57,43,0.15),rgba(232,84,26,0.1));
-      border:1px solid rgba(232,84,26,0.3);
-      border-radius:16px;
-      padding:1.2rem 1.5rem;
-      margin-bottom:2rem;
-      display:flex;
-      gap:1rem;
-      align-items:center;
-      flex-wrap:wrap;
-    ">
-      <div style="font-size:2rem;">🔐</div>
-      <div style="flex:1; min-width:250px;">
-        <strong style="color:#E8541A;">Verify your shop to start selling!</strong>
-        <p style="color:rgba(255,255,255,0.6); font-size:0.85rem; margin-top:0.2rem;">
-          GST aur Face scan verification complete karo taaki customers trust karein.
-        </p>
-      </div>
-      <a href="security.html" class="btn-primary"
-        style="width:auto; padding:10px 20px; font-size:0.9rem;">
-        Verify Now 🔒
-      </a>
-    </div>
-  `;
+function updateUIFromProfile() {
+  document.getElementById('shop-subtitle').textContent = 
+    (merchant.shopName || 'My Shop') + ' • ' + (merchant.village || 'Location not set');
+
+  // Verification badge
+  const verified = merchant.gstVerified && merchant.faceVerified;
+  const badge = document.getElementById('verify-badge');
+  if (verified) {
+    badge.className = 'sidebar-verified';
+    badge.textContent = '✓ Verified Shop';
+  } else {
+    badge.className = 'sidebar-verified unverified';
+    badge.innerHTML = '⚠ <a href="security.html" style="color:#E8541A;">Verify Now</a>';
+  }
+
+  // Verify banner
+  const banner = document.getElementById('verify-banner');
+  if (!verified) {
+    banner.innerHTML = `
+      <div style="background:linear-gradient(135deg,rgba(192,57,43,0.15),rgba(232,84,26,0.1)); border:1px solid rgba(232,84,26,0.3); border-radius:16px; padding:1.2rem 1.5rem; margin-bottom:2rem; display:flex; gap:1rem; align-items:center; flex-wrap:wrap;">
+        <div style="font-size:2rem;">🔐</div>
+        <div style="flex:1; min-width:250px;">
+          <strong style="color:#E8541A;">Verify your shop to start selling!</strong>
+          <p style="color:rgba(255,255,255,0.6); font-size:0.85rem; margin-top:0.2rem;">GST aur Face scan complete karo.</p>
+        </div>
+        <a href="security.html" class="btn-primary" style="width:auto; padding:10px 20px; font-size:0.9rem;">Verify Now 🔒</a>
+      </div>`;
+  } else {
+    banner.innerHTML = '';
+  }
 }
 
-// ═══════════ PAGE SWITCHING ═══════════
-function switchPage(p) {
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  document.getElementById('page-' + p).classList.add('active');
-  document.querySelectorAll('.nav-item[data-page]').forEach(n => n.classList.remove('active'));
-  document.querySelector(`.nav-item[data-page="${p}"]`).classList.add('active');
-  document.getElementById('sidebar').classList.remove('open');
-
-  if (p === 'dashboard') loadDashboard();
-  if (p === 'products') renderProducts();
-  if (p === 'orders') renderOrders();
-  if (p === 'shop') renderShopProfile();
+// ═══════════ CLOUD: REAL-TIME PRODUCT LISTENER ═══════════
+function startProductListener() {
+  db.collection('products')
+    .where('merchantId', '==', session.id)
+    .onSnapshot((snapshot) => {
+      const products = [];
+      snapshot.forEach(doc => {
+        products.push({ id: doc.id, ...doc.data() });
+      });
+      merchant.products = products;
+      renderProductsUI();
+      updateDashboardStats();
+    }, (error) => {
+      console.error('Product listener error:', error);
+      toast('Cloud connection issue', 'error');
+    });
 }
 
-function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('open');
+// ═══════════ CLOUD: REAL-TIME ORDER LISTENER ═══════════
+function startOrderListener() {
+  db.collection('orders')
+    .where('merchantIds', 'array-contains', session.id)
+    .onSnapshot((snapshot) => {
+      const orders = [];
+      snapshot.forEach(doc => {
+        orders.push({ id: doc.id, ...doc.data() });
+      });
+      // Sort by date (newest first)
+      orders.sort((a, b) => {
+        const ta = a.createdAt?.seconds || 0;
+        const tb = b.createdAt?.seconds || 0;
+        return tb - ta;
+      });
+      merchant.orders = orders;
+      renderOrdersUI();
+      renderRecentOrders();
+      updateDashboardStats();
+    }, (error) => {
+      console.error('Order listener error:', error);
+    });
 }
 
-// ═══════════ DASHBOARD ═══════════
-function loadDashboard() {
-  merchant = getUserById(session.id, 'merchant');
-  const orders = getOrdersForMerchant(session.id);
+// ═══════════ DASHBOARD STATS ═══════════
+function updateDashboardStats() {
+  const orders = merchant.orders || [];
   const completed = orders.filter(o => o.status === 'completed');
   const revenue = completed.reduce((s, o) => {
-    const myTotal = o.items
+    const myTotal = (o.items || [])
       .filter(i => i.merchantId === session.id)
-      .reduce((a, i) => a + i.price * i.qty, 0);
+      .reduce((a, i) => a + (i.price * i.qty), 0);
     return s + myTotal;
   }, 0);
 
   document.getElementById('stat-revenue').textContent = fmtPrice(revenue);
   document.getElementById('stat-orders').textContent = orders.length;
-  document.getElementById('stat-products').textContent = merchant.products.length;
-  document.getElementById('stat-rating').textContent = '⭐ ' + merchant.rating.toFixed(1);
+  document.getElementById('stat-products').textContent = (merchant.products || []).length;
+  document.getElementById('stat-rating').textContent = '⭐ ' + (merchant.rating || 0).toFixed(1);
+}
 
+function renderRecentOrders() {
   const recentEl = document.getElementById('recent-orders');
-  const recent = orders.slice(0, 3);
+  const recent = (merchant.orders || []).slice(0, 3);
   if (recent.length === 0) {
     recentEl.innerHTML = `
       <div class="empty-state">
@@ -502,25 +458,36 @@ function loadDashboard() {
     recentEl.innerHTML = recent.map(o => renderOrderCard(o)).join('');
   }
 }
-loadDashboard();
 
-// ═══════════ IMAGE UPLOAD FUNCTIONS ═══════════
+// ═══════════ PAGE SWITCHING ═══════════
+function switchPage(p) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + p).classList.add('active');
+  document.querySelectorAll('.nav-item[data-page]').forEach(n => n.classList.remove('active'));
+  document.querySelector(`.nav-item[data-page="${p}"]`).classList.add('active');
+  document.getElementById('sidebar').classList.remove('open');
 
-// Image select handler (gallery + camera dono ke liye)
+  if (p === 'shop') renderShopProfile();
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+// ═══════════ IMAGE UPLOAD ═══════════
 function handleImageSelect(input) {
   const file = input.files[0];
   if (!file) return;
 
-  // File type check
   const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
   if (!allowedTypes.includes(file.type)) {
-    toast('❌ Only JPG, PNG, WEBP images allowed!', 'error');
+    toast('❌ Only JPG, PNG, WEBP allowed!', 'error');
     input.value = '';
     return;
   }
 
-  // File size check — max 5MB
-  const maxSize = 5 * 1024 * 1024;
+  // 1MB limit for Firestore (Base64 is ~33% bigger)
+  const maxSize = 1 * 1024 * 1024;
   const warning = document.getElementById('img-size-warning');
   if (file.size > maxSize) {
     warning.style.display = 'block';
@@ -529,180 +496,120 @@ function handleImageSelect(input) {
   }
   warning.style.display = 'none';
 
-  // FileReader se Base64 mein convert karo
   const reader = new FileReader();
   reader.onload = function(e) {
     currentImageBase64 = e.target.result;
     showImagePreview(currentImageBase64, file.name);
     toast('✅ Image selected!', 'success');
   };
-  reader.onerror = function() {
-    toast('❌ Error reading image. Try again!', 'error');
-  };
+  reader.onerror = () => toast('❌ Error reading image', 'error');
   reader.readAsDataURL(file);
 }
 
-// Preview dikhao
 function showImagePreview(src, fileName) {
-  const previewImg    = document.getElementById('img-preview');
-  const placeholder   = document.getElementById('img-placeholder');
-  const removeBtn     = document.getElementById('img-remove-btn');
-  const previewBox    = document.getElementById('img-preview-box');
-  const fileNameEl    = document.getElementById('img-file-name');
-
-  previewImg.src = src;
-  previewImg.style.display = 'block';
-  placeholder.style.display = 'none';
-  removeBtn.style.display = 'flex';
-  previewBox.style.borderColor = 'rgba(245,166,35,0.6)';
-  previewBox.style.borderStyle = 'solid';
-  previewBox.style.background = 'rgba(0,0,0,0.2)';
-  previewBox.onclick = null; // Click disable (remove btn ke liye)
-
+  document.getElementById('img-preview').src = src;
+  document.getElementById('img-preview').style.display = 'block';
+  document.getElementById('img-placeholder').style.display = 'none';
+  document.getElementById('img-remove-btn').style.display = 'flex';
+  const box = document.getElementById('img-preview-box');
+  box.style.borderColor = 'rgba(245,166,35,0.6)';
+  box.style.borderStyle = 'solid';
+  box.onclick = null;
   if (fileName) {
-    fileNameEl.style.display = 'block';
-    fileNameEl.textContent = '📎 ' + fileName;
+    const f = document.getElementById('img-file-name');
+    f.style.display = 'block';
+    f.textContent = '📎 ' + fileName;
   }
 }
 
-// Image remove karo
 function removeImage(event) {
-  event.stopPropagation();
+  if (event) event.stopPropagation();
   currentImageBase64 = null;
-
-  const previewImg  = document.getElementById('img-preview');
-  const placeholder = document.getElementById('img-placeholder');
-  const removeBtn   = document.getElementById('img-remove-btn');
-  const previewBox  = document.getElementById('img-preview-box');
-  const fileNameEl  = document.getElementById('img-file-name');
-
-  previewImg.src = '';
-  previewImg.style.display = 'none';
-  placeholder.style.display = 'flex';
-  removeBtn.style.display = 'none';
-  previewBox.style.borderColor = 'rgba(255,255,255,0.2)';
-  previewBox.style.borderStyle = 'dashed';
-  previewBox.style.background = 'rgba(255,255,255,0.03)';
-  previewBox.onclick = () => document.getElementById('img-gallery').click();
-
-  fileNameEl.style.display = 'none';
-  fileNameEl.textContent = '';
-
-  document.getElementById('img-gallery').value = '';
-  document.getElementById('img-camera').value = '';
-  document.getElementById('img-size-warning').style.display = 'none';
-
+  resetImageUpload();
   toast('🗑️ Image removed', 'info');
 }
 
-// Reset image upload (modal open/close par)
 function resetImageUpload() {
   currentImageBase64 = null;
-
-  const previewImg  = document.getElementById('img-preview');
-  const placeholder = document.getElementById('img-placeholder');
-  const removeBtn   = document.getElementById('img-remove-btn');
-  const previewBox  = document.getElementById('img-preview-box');
-  const fileNameEl  = document.getElementById('img-file-name');
-
-  previewImg.src = '';
-  previewImg.style.display = 'none';
-  placeholder.style.display = 'flex';
-  removeBtn.style.display = 'none';
-  previewBox.style.borderColor = 'rgba(255,255,255,0.2)';
-  previewBox.style.borderStyle = 'dashed';
-  previewBox.style.background = 'rgba(255,255,255,0.03)';
-  previewBox.onclick = () => document.getElementById('img-gallery').click();
-
-  fileNameEl.style.display = 'none';
-  fileNameEl.textContent = '';
-
+  document.getElementById('img-preview').src = '';
+  document.getElementById('img-preview').style.display = 'none';
+  document.getElementById('img-placeholder').style.display = 'flex';
+  document.getElementById('img-remove-btn').style.display = 'none';
+  const box = document.getElementById('img-preview-box');
+  box.style.borderColor = 'rgba(255,255,255,0.2)';
+  box.style.borderStyle = 'dashed';
+  box.style.background = 'rgba(255,255,255,0.03)';
+  box.onclick = () => document.getElementById('img-gallery').click();
+  document.getElementById('img-file-name').style.display = 'none';
   document.getElementById('img-gallery').value = '';
   document.getElementById('img-camera').value = '';
   document.getElementById('img-size-warning').style.display = 'none';
 }
 
-// ═══════════ PRODUCTS ═══════════
-function renderProducts() {
-  merchant = getUserById(session.id, 'merchant');
-  const search = document.getElementById('prod-search').value.toLowerCase();
+// ═══════════ PRODUCTS UI ═══════════
+function renderProductsUI() {
+  const searchEl = document.getElementById('prod-search');
+  const search = searchEl ? searchEl.value.toLowerCase() : '';
   const wrap = document.getElementById('products-list');
-  let prods = merchant.products;
-  if (search) prods = prods.filter(p =>
-    p.name.toLowerCase().includes(search) ||
-    p.category.toLowerCase().includes(search)
-  );
+  let prods = merchant.products || [];
+
+  if (search) {
+    prods = prods.filter(p =>
+      (p.name || '').toLowerCase().includes(search) ||
+      (p.category || '').toLowerCase().includes(search)
+    );
+  }
 
   if (prods.length === 0) {
     wrap.innerHTML = `
       <div class="empty-state">
         <div class="empty-state-icon">📦</div>
         <div class="empty-state-title">${search ? 'No products match' : 'No products yet'}</div>
-        <div class="empty-state-text">
-          ${search ? 'Try a different search' : 'Add your first product to start selling!'}
-        </div>
-        ${!search ? `<button class="btn-primary" style="width:auto; padding:10px 24px;"
-          onclick="openAddProduct()">+ Add Product</button>` : ''}
+        <div class="empty-state-text">${search ? 'Try a different search' : 'Add your first product to start selling!'}</div>
+        ${!search ? `<button class="btn-primary" style="width:auto; padding:10px 24px;" onclick="openAddProduct()">+ Add Product</button>` : ''}
       </div>`;
     return;
   }
 
   wrap.innerHTML = `<div class="grid-cards">` + prods.map(p => `
     <div class="product-card">
-
-      <!-- Product Image or Emoji -->
       <div class="product-img-box">
         ${p.image
-          ? `<img src="${p.image}" alt="${p.name}"
-               style="width:100%; height:100%; object-fit:cover;">`
-          : `<span class="product-emoji">${p.emoji || '📦'}</span>`
-        }
+          ? `<img src="${p.image}" alt="${p.name}">`
+          : `<span class="product-emoji">${p.emoji || '📦'}</span>`}
       </div>
-
       <div class="product-name">${p.name}</div>
       <div class="product-shop">${p.category}</div>
-
       <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
         <span style="font-size:0.7rem; color:rgba(255,255,255,0.4);">Price:</span>
-        <input type="number" class="price-input-small" value="${p.price}"
-          onchange="quickUpdate('${p.id}','price',this.value)">
+        <input type="number" class="price-input-small" value="${p.price}" onchange="quickUpdate('${p.id}','price',this.value)">
       </div>
-
       <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.8rem;">
         <span style="font-size:0.7rem; color:rgba(255,255,255,0.4);">Stock:</span>
-        <input type="number" class="price-input-small" value="${p.stock}"
-          onchange="quickUpdate('${p.id}','stock',this.value)"
-          style="color:${p.stock < 10 ? '#E74C3C' : '#4CAF50'};">
+        <input type="number" class="price-input-small" value="${p.stock}" onchange="quickUpdate('${p.id}','stock',this.value)" style="color:${p.stock < 10 ? '#E74C3C' : '#4CAF50'};">
       </div>
-
       <div class="product-stock ${p.stock === 0 ? 'out' : p.stock < 10 ? 'low' : ''}">
-        ${p.stock === 0
-          ? '⚠ Out of Stock'
-          : p.stock < 10
-            ? '⚠ Low Stock: ' + p.stock + ' left'
-            : '✓ In Stock'}
+        ${p.stock === 0 ? '⚠ Out of Stock' : p.stock < 10 ? '⚠ Low Stock: ' + p.stock + ' left' : '✓ In Stock'}
       </div>
-
       <div class="product-actions" style="margin-top:0.5rem;">
         <button class="btn-icon" onclick="editProduct('${p.id}')" title="Edit">✏️</button>
         <button class="btn-icon danger" onclick="deleteProduct('${p.id}')" title="Delete">🗑️</button>
       </div>
-
     </div>
   `).join('') + `</div>`;
 }
 
-function quickUpdate(pid, field, val) {
+// ═══════════ PRODUCT CLOUD ACTIONS ═══════════
+async function quickUpdate(pid, field, val) {
   const v = parseInt(val);
-  if (isNaN(v) || v < 0) {
-    toast('Invalid value', 'error');
-    renderProducts();
-    return;
+  if (isNaN(v) || v < 0) { toast('Invalid value', 'error'); return; }
+  try {
+    await db.collection('products').doc(pid).update({ [field]: v });
+    toast(field === 'price' ? 'Price updated 💰' : 'Stock updated 📦', 'success');
+  } catch (e) {
+    console.error(e);
+    toast('Update failed', 'error');
   }
-  updateProduct(session.id, pid, { [field]: v });
-  toast(field === 'price' ? 'Price updated 💰' : 'Stock updated 📦', 'success');
-  if (field === 'stock') renderProducts();
-  loadDashboard();
 }
 
 function openAddProduct() {
@@ -714,12 +621,12 @@ function openAddProduct() {
   document.getElementById('p-price').value = '';
   document.getElementById('p-stock').value = '';
   document.getElementById('p-category').value = 'Grocery';
-  resetImageUpload(); // ✅ Image reset
+  resetImageUpload();
   document.getElementById('product-modal').classList.add('open');
 }
 
 function editProduct(pid) {
-  const p = merchant.products.find(x => x.id === pid);
+  const p = (merchant.products || []).find(x => x.id === pid);
   if (!p) return;
   editingId = pid;
   document.getElementById('modal-title').textContent = 'Edit Product';
@@ -729,68 +636,75 @@ function editProduct(pid) {
   document.getElementById('p-price').value = p.price;
   document.getElementById('p-stock').value = p.stock;
   document.getElementById('p-category').value = p.category;
-
-  // ✅ Existing image load karo
   resetImageUpload();
   if (p.image) {
     currentImageBase64 = p.image;
     showImagePreview(p.image, 'Current Image');
   }
-
   document.getElementById('product-modal').classList.add('open');
 }
 
 function closeModal() {
   document.getElementById('product-modal').classList.remove('open');
-  resetImageUpload(); // ✅ Reset on close
+  resetImageUpload();
 }
 
-function saveProduct() {
-  const emoji    = document.getElementById('p-emoji').value.trim() || '📦';
-  const name     = document.getElementById('p-name').value.trim();
-  const price    = parseInt(document.getElementById('p-price').value);
-  const stock    = parseInt(document.getElementById('p-stock').value);
+async function saveProduct() {
+  const emoji = document.getElementById('p-emoji').value.trim() || '📦';
+  const name = document.getElementById('p-name').value.trim();
+  const price = parseInt(document.getElementById('p-price').value);
+  const stock = parseInt(document.getElementById('p-stock').value);
   const category = document.getElementById('p-category').value;
 
-  if (!name)                    return toast('Please enter product name', 'error');
-  if (!price || price < 1)      return toast('Please enter valid price', 'error');
+  if (!name) return toast('Please enter product name', 'error');
+  if (!price || price < 1) return toast('Please enter valid price', 'error');
   if (isNaN(stock) || stock < 0) return toast('Please enter valid stock', 'error');
 
-  // ✅ Image bhi save hogi
+  const btn = document.getElementById('save-btn');
+  btn.disabled = true;
+  btn.textContent = 'Saving to cloud...';
+
   const productData = {
-    emoji,
-    name,
-    price,
-    stock,
-    category,
-    image: currentImageBase64 || null
+    merchantId: session.id,
+    merchantName: merchant.shopName || session.name,
+    emoji, name, price, stock, category,
+    image: currentImageBase64 || null,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
   };
 
-  if (editingId) {
-    updateProduct(session.id, editingId, productData);
-    toast('Product updated! ✓', 'success');
-  } else {
-    addProduct(session.id, productData);
-    toast('Product added! 🎉', 'success');
+  try {
+    if (editingId) {
+      await db.collection('products').doc(editingId).update(productData);
+      toast('Product updated! ☁️✓', 'success');
+    } else {
+      productData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      await db.collection('products').add(productData);
+      toast('Product added to cloud! 🎉', 'success');
+    }
+    closeModal();
+  } catch (e) {
+    console.error('Save error:', e);
+    toast('❌ Save failed: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save Product';
   }
-
-  closeModal();
-  renderProducts();
-  loadDashboard();
 }
 
-function deleteProduct(pid) {
+async function deleteProduct(pid) {
   if (!confirm('Are you sure you want to delete this product?')) return;
-  removeProduct(session.id, pid);
-  toast('Product removed', 'info');
-  renderProducts();
-  loadDashboard();
+  try {
+    await db.collection('products').doc(pid).delete();
+    toast('Product removed from cloud', 'info');
+  } catch (e) {
+    console.error(e);
+    toast('Delete failed', 'error');
+  }
 }
 
-// ═══════════ ORDERS ═══════════
-function renderOrders() {
-  merchant = getUserById(session.id, 'merchant');
-  let orders = getOrdersForMerchant(session.id);
+// ═══════════ ORDERS UI ═══════════
+function renderOrdersUI() {
+  let orders = merchant.orders || [];
   if (orderFilter !== 'all') orders = orders.filter(o => o.status === orderFilter);
   const wrap = document.getElementById('merchant-orders');
 
@@ -803,86 +717,97 @@ function renderOrders() {
       </div>`;
     return;
   }
-
   wrap.innerHTML = orders.map(o => renderOrderCard(o, true)).join('');
 }
 
 function renderOrderCard(o, showActions = false) {
-  const myItems = o.items.filter(i => i.merchantId === session.id);
+  const myItems = (o.items || []).filter(i => i.merchantId === session.id);
   const myTotal = myItems.reduce((s, i) => s + i.price * i.qty, 0);
   return `
     <div class="order-card ${o.status}">
       <div class="order-header">
-        <div class="order-id">${o.id}</div>
+        <div class="order-id">#${o.id.substring(0,8)}</div>
         <span class="order-status status-${o.status}">${o.status}</span>
       </div>
       <div class="order-meta">🗓️ ${fmtDate(o.createdAt)}</div>
       <div class="order-items">
-        ${myItems.map(i =>
-          `<div>• ${i.name} × ${i.qty} — ${fmtPrice(i.price * i.qty)}</div>`
-        ).join('')}
+        ${myItems.map(i => `<div>• ${i.name} × ${i.qty} — ${fmtPrice(i.price * i.qty)}</div>`).join('')}
       </div>
       <div class="order-footer">
-        <div style="color:rgba(255,255,255,0.5); font-size:0.8rem;">Your earnings from this order</div>
+        <div style="color:rgba(255,255,255,0.5); font-size:0.8rem;">Your earnings</div>
         <div class="order-total">${fmtPrice(myTotal)}</div>
       </div>
       ${showActions && o.status === 'pending' ? `
         <div style="margin-top:1rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
-          <button class="btn-primary btn-green"
-            style="width:auto; padding:8px 16px; font-size:0.85rem;"
-            onclick="updateOrder('${o.id}','completed')">✓ Mark Complete</button>
-          <button class="btn-outline"
-            style="padding:8px 16px; font-size:0.85rem;"
-            onclick="updateOrder('${o.id}','cancelled')">✕ Cancel</button>
+          <button class="btn-primary btn-green" style="width:auto; padding:8px 16px; font-size:0.85rem;" onclick="updateOrder('${o.id}','completed')">✓ Mark Complete</button>
+          <button class="btn-outline" style="padding:8px 16px; font-size:0.85rem;" onclick="updateOrder('${o.id}','cancelled')">✕ Cancel</button>
         </div>
       ` : ''}
-    </div>
-  `;
+    </div>`;
 }
 
-function updateOrder(oid, status) {
-  updateOrderStatus(oid, status);
-  toast(`Order ${status}!`, status === 'completed' ? 'success' : 'info');
-  renderOrders();
-  loadDashboard();
+async function updateOrder(oid, status) {
+  try {
+    await db.collection('orders').doc(oid).update({ 
+      status: status,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    toast(`Order ${status}!`, status === 'completed' ? 'success' : 'info');
+  } catch (e) {
+    console.error(e);
+    toast('Update failed', 'error');
+  }
 }
 
 function filterOrders(el, f) {
   orderFilter = f;
   document.querySelectorAll('#page-orders .tab-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
-  renderOrders();
+  renderOrdersUI();
 }
 
 // ═══════════ SHOP PROFILE ═══════════
 function renderShopProfile() {
-  merchant = getUserById(session.id, 'merchant');
-  document.getElementById('sp-shop-name').textContent = merchant.shopName;
-  document.getElementById('sp-category').textContent = merchant.category + ' • ' + merchant.village;
-  document.getElementById('sp-owner').textContent = merchant.name;
-  document.getElementById('sp-phone').textContent = '+91 ' + merchant.phone;
-  document.getElementById('sp-village').textContent = merchant.village;
-  document.getElementById('sp-rating').textContent = '⭐ ' + merchant.rating.toFixed(1);
+  document.getElementById('sp-shop-name').textContent = merchant.shopName || '-';
+  document.getElementById('sp-category').textContent = (merchant.category || '-') + ' • ' + (merchant.village || '-');
+  document.getElementById('sp-owner').textContent = merchant.name || '-';
+  document.getElementById('sp-phone').textContent = merchant.phone ? '+91 ' + merchant.phone : '-';
+  document.getElementById('sp-village').textContent = merchant.village || '-';
+  document.getElementById('sp-rating').textContent = '⭐ ' + (merchant.rating || 0).toFixed(1);
 
   const vStatus = document.getElementById('verification-status');
   if (merchant.gstVerified && merchant.faceVerified) {
     vStatus.style.background = 'rgba(26,122,74,0.1)';
     vStatus.style.border = '1px solid rgba(26,122,74,0.4)';
     vStatus.style.color = '#4CAF50';
-    vStatus.innerHTML = '✅ <strong>Verified Shop</strong> — GST & Face Scan complete. Customers trust you!';
+    vStatus.innerHTML = '✅ <strong>Verified Shop</strong> — GST & Face Scan complete!';
     document.getElementById('verify-action').innerHTML = '';
   } else {
     vStatus.style.background = 'rgba(192,57,43,0.1)';
     vStatus.style.border = '1px solid rgba(192,57,43,0.4)';
     vStatus.style.color = '#E8541A';
-    vStatus.innerHTML = '⚠ <strong>Verification Pending</strong> — Complete GST + Face Scan to unlock all features.';
-    document.getElementById('verify-action').innerHTML = `
-      <a href="security.html" class="btn-primary"
-        style="display:block; text-align:center; padding:12px;">
-        🔐 Complete Verification
-      </a>`;
+    vStatus.innerHTML = '⚠ <strong>Verification Pending</strong> — Complete GST + Face Scan.';
+    document.getElementById('verify-action').innerHTML = `<a href="security.html" class="btn-primary" style="display:block; text-align:center; padding:12px;">🔐 Complete Verification</a>`;
   }
 }
+
+// ═══════════ LOGOUT ═══════════
+function logout() {
+  if (!confirm('Logout karna chahte ho?')) return;
+  localStorage.removeItem('user_session');
+  window.location.href = '../index.html';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 🚀 START THE APP
+// ═══════════════════════════════════════════════════════════════
+(async function init() {
+  await loadMerchantProfile();
+  startProductListener();
+  startOrderListener();
+  console.log('✅ Bharat Nexus Cloud connected!');
+})();
+
 </script>
 </body>
 </html>
